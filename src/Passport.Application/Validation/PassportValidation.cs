@@ -1,6 +1,6 @@
 ﻿using Passport.Application.Default;
+using Passport.Application.Interface;
 using Passport.Application.Result;
-using Passport.Domain;
 
 namespace Passport.Application.Validation
 {

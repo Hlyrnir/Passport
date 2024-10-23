@@ -13,11 +13,11 @@ namespace Passport.Api.Endpoint.PassportHolder
     {
         public const string Name = "ConfirmEmailAddress";
 
-        public static void AddConfirmEmailAddressEndpoint(this IEndpointRouteBuilder epBuilder)
+        public static void AddConfirmEmailAddressEndpoint(this IEndpointRouteBuilder epBuilder, params string[] sPolicyName)
         {
             epBuilder.MapPut(
                 EndpointRoute.PassportHolder.ConfirmEmailAddress, ConfirmEmailAddress)
-                .RequireAuthorization(EndpointAuthorization.Passport)
+                .RequireAuthorization(sPolicyName)
                 .WithName(Name)
                 .WithTags("PassportHolder")
                 .Produces(StatusCodes.Status401Unauthorized)

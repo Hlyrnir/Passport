@@ -1,6 +1,6 @@
-﻿using Passport.Domain;
+﻿using Passport.Application.Interface;
 
-namespace Passport.DataFaker
+namespace Passport.Application.Test.Fake
 {
     internal class FakePassportSetting : IPassportSetting
     {

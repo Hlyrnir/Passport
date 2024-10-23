@@ -23,7 +23,7 @@ namespace Passport.Application.Test.Command.DeletePassportHolder
         public async Task Delete_ShouldReturnTrue_WhenHolderExists()
         {
             // Arrange
-            Domain.Aggregate.PassportHolder ppHolder = DataFaker.PassportHolder.CreateDefault(fxtPassport.PassportSetting);
+            Domain.Aggregate.PassportHolder ppHolder = DataFaker.PassportHolder.CreateDefault();
             IPassportCredential ppCredential = DataFaker.PassportCredential.CreateDefault();
 
             await fxtPassport.PassportHolderRepository.InsertAsync(ppHolder.MapToTransferObject(), prvTime.GetUtcNow(), CancellationToken.None);

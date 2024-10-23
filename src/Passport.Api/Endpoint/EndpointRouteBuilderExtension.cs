@@ -15,38 +15,38 @@ namespace Passport.Api.Endpoint
             epBuilder.AddGenerateAuthenticationTokenByRefreshTokenEndpoint();
         }
 
-        public static void AddPassportEndpoint(this IEndpointRouteBuilder epBuilder)
+        public static void AddPassportEndpoint(this IEndpointRouteBuilder epBuilder, params string[] sPolicyName)
         {
-            epBuilder.AddFindPassportByIdEndpoint();
-            epBuilder.AddRegisterPassportEndpoint();
-            epBuilder.AddSeizePassportEndpoint();
-            epBuilder.AddUpdatePassportEndpoint();
+            epBuilder.AddFindPassportByIdEndpoint(sPolicyName: sPolicyName);
+            epBuilder.AddRegisterPassportEndpoint(sPolicyName: sPolicyName);
+            epBuilder.AddSeizePassportEndpoint(sPolicyName: sPolicyName);
+            epBuilder.AddUpdatePassportEndpoint(sPolicyName: sPolicyName);
         }
 
-        public static void AddPassportHolderEndpoint(this IEndpointRouteBuilder epBuilder)
+        public static void AddPassportHolderEndpoint(this IEndpointRouteBuilder epBuilder, params string[] sPolicyName)
         {
-            epBuilder.AddConfirmEmailAddressEndpoint();
-            epBuilder.AddConfirmPhoneNumberEndpoint();
-            epBuilder.AddDeletePassportHolderEndpoint();
-            epBuilder.AddFindPassportHolderByIdEndpoint();
-            epBuilder.AddUpdatePassportHolderEndpoint();
+            epBuilder.AddConfirmEmailAddressEndpoint(sPolicyName: sPolicyName);
+            epBuilder.AddConfirmPhoneNumberEndpoint(sPolicyName: sPolicyName);
+            epBuilder.AddDeletePassportHolderEndpoint(sPolicyName: sPolicyName);
+            epBuilder.AddFindPassportHolderByIdEndpoint(sPolicyName: sPolicyName);
+            epBuilder.AddUpdatePassportHolderEndpoint(sPolicyName: sPolicyName);
         }
 
-        public static void AddPassportTokenEndpoint(this IEndpointRouteBuilder epBuilder)
+        public static void AddPassportTokenEndpoint(this IEndpointRouteBuilder epBuilder, params string[] sPolicyName)
         {
-            epBuilder.AddCreatePassportTokenEndpoint();
-            epBuilder.AddDeletePassportTokenEndpoint();
-            epBuilder.AddEnableTwoFactorAuthenticationEndpoint();
-            epBuilder.AddResetCredentialEndpoint();
+            epBuilder.AddCreatePassportTokenEndpoint(sPolicyName: sPolicyName);
+            epBuilder.AddDeletePassportTokenEndpoint(sPolicyName: sPolicyName);
+            epBuilder.AddEnableTwoFactorAuthenticationEndpoint(sPolicyName: sPolicyName);
+            epBuilder.AddResetCredentialEndpoint(sPolicyName: sPolicyName);
         }
 
-        public static void AddPassportVisaEndpoint(this IEndpointRouteBuilder epBuilder)
+        public static void AddPassportVisaEndpoint(this IEndpointRouteBuilder epBuilder, params string[] sPolicyName)
         {
-            epBuilder.AddCreatePassportVisaEndpoint();
-            epBuilder.AddDeletePassportVisaEndpoint();
-            epBuilder.AddFindPassportVisaByIdEndpoint();
-            epBuilder.AddFindPassportVisaByPassportIdEndpoint();
-            epBuilder.AddUpdatePassportVisaEndpoint();
+            epBuilder.AddCreatePassportVisaEndpoint(sPolicyName: sPolicyName);
+            epBuilder.AddDeletePassportVisaEndpoint(sPolicyName: sPolicyName);
+            epBuilder.AddFindPassportVisaByIdEndpoint(sPolicyName: sPolicyName);
+            epBuilder.AddFindPassportVisaByPassportIdEndpoint(sPolicyName: sPolicyName);
+            epBuilder.AddUpdatePassportVisaEndpoint(sPolicyName: sPolicyName);
         }
     }
 }

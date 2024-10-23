@@ -1,4 +1,6 @@
-﻿namespace Passport.Domain.Aggregate
+﻿using Passport.Domain.ValueObject;
+
+namespace Passport.Domain.Aggregate
 {
     public sealed class PassportHolder
     {
@@ -77,7 +79,7 @@
             return true;
         }
 
-        public bool TryChangeEmailAddress(string sEmailAddress, IPassportSetting ppSetting)
+        public bool TryChangeEmailAddress(string sEmailAddress, PassportHolderSetting ppSetting)
         {
             if (EmailAddressIsValid(sEmailAddress, ppSetting) == false)
                 return false;
@@ -93,7 +95,7 @@
             return true;
         }
 
-        public bool TryChangePhoneNumber(string sPhoneNumber, IPassportSetting ppSetting)
+        public bool TryChangePhoneNumber(string sPhoneNumber, PassportHolderSetting ppSetting)
         {
             if (PhoneNumberIsValid(sPhoneNumber, ppSetting) == false)
                 return false;
@@ -109,7 +111,7 @@
             return true;
         }
 
-        public bool TryConfirmEmailAddress(string sEmailAddressToConfirm, IPassportSetting ppSetting)
+        public bool TryConfirmEmailAddress(string sEmailAddressToConfirm, PassportHolderSetting ppSetting)
         {
             if (EmailAddressIsValid(sEmailAddressToConfirm, ppSetting) == false)
                 return false;
@@ -123,7 +125,7 @@
             return true;
         }
 
-        public bool TryConfirmPhoneNumber(string sPhoneNumberToConfirm, IPassportSetting ppSetting)
+        public bool TryConfirmPhoneNumber(string sPhoneNumberToConfirm, PassportHolderSetting ppSetting)
         {
             if (PhoneNumberIsValid(sPhoneNumberToConfirm, ppSetting) == false)
                 return false;
@@ -137,13 +139,7 @@
             return true;
         }
 
-        // The SecurityStamp property is automatically updated whenever a user's password is changed or when the user's account is modified in any way.
-        private void ResetSecurityStamp()
-        {
-            sSecurityStamp = Guid.NewGuid().ToString();
-        }
-
-        private bool EmailAddressIsValid(string sEmailAddress, IPassportSetting ppSetting)
+        private bool EmailAddressIsValid(string sEmailAddress, PassportHolderSetting ppSetting)
         {
             if (string.IsNullOrWhiteSpace(sEmailAddress) == true)
                 return false;
@@ -163,7 +159,7 @@
             return true;
         }
 
-        private bool PhoneNumberIsValid(string sPhoneNumber, IPassportSetting ppSetting)
+        private bool PhoneNumberIsValid(string sPhoneNumber, PassportHolderSetting ppSetting)
         {
             if (string.IsNullOrWhiteSpace(sPhoneNumber) == true)
                 return false;
@@ -172,6 +168,12 @@
                 return false;
 
             return true;
+        }
+
+        // The SecurityStamp property is automatically updated whenever a user's password is changed or when the user's account is modified in any way.
+        private void ResetSecurityStamp()
+        {
+            sSecurityStamp = Guid.NewGuid().ToString();
         }
 
         public static PassportHolder? Initialize(
@@ -185,7 +187,7 @@
             string sPhoneNumber,
             bool bPhoneNumberIsConfirmed,
             string sSecurityStamp,
-            IPassportSetting ppSetting)
+            PassportHolderSetting ppSetting)
         {
             PassportHolder ppHolder = new PassportHolder(
                 sConcurrencyStamp: sConcurrencyStamp,
@@ -217,7 +219,7 @@
             string sFirstName,
             string sLastName,
             string sPhoneNumber,
-            IPassportSetting ppSetting)
+            PassportHolderSetting ppSetting)
         {
             return Initialize(
                 sConcurrencyStamp: Guid.NewGuid().ToString(),

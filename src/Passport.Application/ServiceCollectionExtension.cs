@@ -37,7 +37,6 @@ namespace Passport.Application
         public static IServiceCollection AddApplicationServiceCollection(this IServiceCollection cltService)
         {
             cltService.TryAddTransient<IPassportCredential, PassportCredential>();
-            cltService.TryAddScoped<IPassportSetting, PassportSetting>();
             cltService.TryAddTransient<IPassportValidation, PassportValidation>();
 
             #region Authentication - Mediator

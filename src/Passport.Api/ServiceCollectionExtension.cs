@@ -2,14 +2,17 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Passport.Abstraction.Authentication;
 using Passport.Application;
+using Passport.Application.Interface;
 using Passport.Infrastructure;
 
 namespace Passport.Api
 {
     public static class ServiceCollectionExtension
     {
-        public static PassportServiceCollectionBuilder AddPassportServiceCollection<T>(this IServiceCollection cltService, Func<IServiceProvider, IAuthenticationTokenHandler<T>>? dlgAuthentication = null)
+        public static PassportServiceCollectionBuilder AddPassport<T>(this IServiceCollection cltService, Func<IServiceProvider, IAuthenticationTokenHandler<T>>? dlgAuthentication = null)
         {
+            cltService.TryAddScoped<IPassportSetting, PassportSetting>();
+
             cltService.AddApplicationServiceCollection();
             cltService.AddInfrastructureServiceCollection();
 

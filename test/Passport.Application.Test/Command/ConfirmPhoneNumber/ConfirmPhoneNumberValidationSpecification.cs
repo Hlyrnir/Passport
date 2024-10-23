@@ -22,7 +22,7 @@ namespace Passport.Application.Test.Command.ConfirmPhoneNumber
         public async Task Update_ShouldReturnTrue_WhenPassportExists()
         {
             // Arrange
-            Domain.Aggregate.PassportHolder ppHolder = DataFaker.PassportHolder.CreateDefault(fxtPassport.PassportSetting);
+            Domain.Aggregate.PassportHolder ppHolder = DataFaker.PassportHolder.CreateDefault();
 
             await fxtPassport.PassportHolderRepository.InsertAsync(ppHolder.MapToTransferObject(), prvTime.GetUtcNow(), CancellationToken.None);
 

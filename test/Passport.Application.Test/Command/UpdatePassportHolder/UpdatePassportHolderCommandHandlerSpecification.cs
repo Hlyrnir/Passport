@@ -23,7 +23,7 @@ namespace Passport.Application.Test.Command.UpdatePassportHolder
         public async Task Update_ShouldReturnTrue_WhenPassportHolderIsUpdated()
         {
             // Arrange
-            Domain.Aggregate.PassportHolder ppHolder = DataFaker.PassportHolder.CreateDefault(fxtPassport.PassportSetting);
+            Domain.Aggregate.PassportHolder ppHolder = DataFaker.PassportHolder.CreateDefault();
 
             await fxtPassport.PassportHolderRepository.InsertAsync(ppHolder.MapToTransferObject(), prvTime.GetUtcNow(), CancellationToken.None);
 
@@ -85,7 +85,7 @@ namespace Passport.Application.Test.Command.UpdatePassportHolder
         public async Task Update_ShouldReturnRepositoryError_WhenConcurrencyStampDoNotMatch()
         {
             // Arrange
-            Domain.Aggregate.PassportHolder ppHolder = DataFaker.PassportHolder.CreateDefault(fxtPassport.PassportSetting);
+            Domain.Aggregate.PassportHolder ppHolder = DataFaker.PassportHolder.CreateDefault();
 
             await fxtPassport.PassportHolderRepository.InsertAsync(ppHolder.MapToTransferObject(), prvTime.GetUtcNow(), CancellationToken.None);
 

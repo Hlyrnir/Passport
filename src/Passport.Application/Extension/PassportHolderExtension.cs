@@ -1,12 +1,12 @@
 ﻿using Passport.Application.Transfer;
-using Passport.Domain;
 using Passport.Domain.Aggregate;
+using Passport.Domain.ValueObject;
 
 namespace Passport.Application.Extension
 {
     internal static class PassportHolderExtension
     {
-        internal static PassportHolder? Initialize(this PassportHolderTransferObject dtoPassportHolder, IPassportSetting ppSetting)
+        internal static PassportHolder? Initialize(this PassportHolderTransferObject dtoPassportHolder, PassportHolderSetting ppSetting)
         {
             return PassportHolder.Initialize(
                 sConcurrencyStamp: dtoPassportHolder.ConcurrencyStamp,

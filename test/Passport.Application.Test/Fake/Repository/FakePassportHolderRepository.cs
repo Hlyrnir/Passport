@@ -1,7 +1,6 @@
 ﻿using Passport.Application.Interface;
 using Passport.Application.Result;
 using Passport.Application.Transfer;
-using Passport.Domain;
 
 #pragma warning disable CS1998 // Bei der asynchronen Methode fehlen "await"-Operatoren. Die Methode wird synchron ausgeführt.
 

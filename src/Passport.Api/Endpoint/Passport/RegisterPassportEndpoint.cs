@@ -14,12 +14,12 @@ namespace Passport.Api.Endpoint.Passport
     {
         public const string Name = "RegisterPassport";
 
-        public static void AddRegisterPassportEndpoint(this IEndpointRouteBuilder epBuilder)
+        public static void AddRegisterPassportEndpoint(this IEndpointRouteBuilder epBuilder, params string[] sPolicyName)
         {
             epBuilder.MapPost(
                 EndpointRoute.Passport.Register, RegisterPassport)
                 .AllowAnonymous()
-                .RequireAuthorization(EndpointAuthorization.Passport)
+                .RequireAuthorization(sPolicyName)
                 .WithName(Name)
                 .WithTags("Passport")
                 .Produces(StatusCodes.Status401Unauthorized)

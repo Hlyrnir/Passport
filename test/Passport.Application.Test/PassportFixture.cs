@@ -4,7 +4,6 @@ using Passport.Application.Interface;
 using Passport.Application.Test.Fake;
 using Passport.Application.Test.Fake.Repository;
 using Passport.Application.Validation;
-using Passport.Domain;
 
 namespace Passport.Application.Test
 {
@@ -30,7 +29,13 @@ namespace Passport.Application.Test
             prvTime = new FakeTimeProvider();
             prvTime.SetUtcNow(new DateTimeOffset(2000, 1, 1, 0, 0, 0, 0, 0, TimeSpan.Zero));
 
-            ppSetting = DataFaker.PassportSetting.Create();
+            ppSetting = new FakePassportSetting()
+            {
+                MaximalAllowedAccessAttempt = 2,
+                ValidProviderName = new List<string>() { "DEFAULT_PROVIDER", "DEFAULT_UNDEFINED" },
+                MaximalCredentialLength = 64,
+                MaximalSignatureLength = 64
+            };
 
             uowUnitOfWork = new FakeUnitOfWork();
 

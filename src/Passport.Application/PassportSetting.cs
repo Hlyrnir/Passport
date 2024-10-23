@@ -1,4 +1,4 @@
-﻿using Passport.Domain;
+﻿using Passport.Application.Interface;
 
 namespace Passport.Application
 {
@@ -14,22 +14,22 @@ namespace Passport.Application
         private const string sRequiredUpperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         private string sRequiredSpecial = "!?@#$%&*";
 
-        public int MaximalAllowedAccessAttempt { get; init; } = 2;
-        public int MaximalCredentialLength { get => iMaximalCredentialLength; init => iMaximalCredentialLength = value; }
-        public TimeSpan MaximalRefreshTokenEffectivity { get; init; } = new TimeSpan(0, 15, 0);
-        public int MaximalSignatureLength { get => iMaximalSignatureLength; init => iMaximalSignatureLength = value; }
-        public TimeSpan MinimalDelayBetweenAttempt { get; init; } = new TimeSpan(0, 0, 30);
-        public TimeSpan MinimalLockoutDuration { get; init; } = new TimeSpan(0, 1, 0);
-        public int MinimalPhoneNumberLength { get; init; } = 3;
-        public TimeSpan PassportExpiresAfterDuration { get; init; } = new TimeSpan(30, 0, 0, 0);
-        public TimeSpan RefreshTokenExpiresAfterDuration { get; init; } = new TimeSpan(30, 0, 0, 0);
-        public int RequiredMinimalCredentialLength { get => iRequiredMinimalCredentialLength; init => iRequiredMinimalCredentialLength = value; }
-        public int RequiredMinimalSignatureLength { get => iRequiredMinimalSignatureLength; init => iRequiredMinimalSignatureLength = value; }
+        public int MaximalAllowedAccessAttempt { get; set; } = 2;
+        public int MaximalCredentialLength { get => iMaximalCredentialLength; set => iMaximalCredentialLength = value; }
+        public TimeSpan MaximalRefreshTokenEffectivity { get; set; } = new TimeSpan(0, 15, 0);
+        public int MaximalSignatureLength { get => iMaximalSignatureLength; set => iMaximalSignatureLength = value; }
+        public TimeSpan MinimalDelayBetweenAttempt { get; set; } = new TimeSpan(0, 0, 30);
+        public TimeSpan MinimalLockoutDuration { get; set; } = new TimeSpan(0, 1, 0);
+        public int MinimalPhoneNumberLength { get; set; } = 3;
+        public TimeSpan PassportExpiresAfterDuration { get; set; } = new TimeSpan(30, 0, 0, 0);
+        public TimeSpan RefreshTokenExpiresAfterDuration { get; set; } = new TimeSpan(30, 0, 0, 0);
+        public int RequiredMinimalCredentialLength { get => iRequiredMinimalCredentialLength; set => iRequiredMinimalCredentialLength = value; }
+        public int RequiredMinimalSignatureLength { get => iRequiredMinimalSignatureLength; set => iRequiredMinimalSignatureLength = value; }
         public string RequiredDigit { get => sRequiredDigit; }
         public string RequiredLowerCase { get => sRequiredLowerCase; }
         public string RequiredUpperCase { get => sRequiredUpperCase; }
-        public string RequiredSpecial { get => sRequiredSpecial; init => sRequiredSpecial = value; }
-        public bool TwoFactorAuthentication { get; init; } = false;
-        public IEnumerable<string> ValidProviderName { get; init; } = new List<string>() { "DEFAULT_JWT" };
+        public string RequiredSpecial { get => sRequiredSpecial; set => sRequiredSpecial = value; }
+        public bool TwoFactorAuthentication { get; set; } = false;
+        public IEnumerable<string> ValidProviderName { get; set; } = new List<string>() { "DEFAULT_JWT" };
     }
 }

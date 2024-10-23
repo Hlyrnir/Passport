@@ -15,11 +15,11 @@ namespace Passport.Api.Endpoint.PassportVisa
     {
         public const string Name = "DeletePassportVisa";
 
-        public static void AddDeletePassportVisaEndpoint(this IEndpointRouteBuilder epBuilder)
+        public static void AddDeletePassportVisaEndpoint(this IEndpointRouteBuilder epBuilder, params string[] sPolicyName)
         {
             epBuilder.MapDelete(
                 EndpointRoute.PassportVisa.Delete, DeletePassportVisa)
-                .RequireAuthorization(EndpointAuthorization.Passport)
+                .RequireAuthorization(sPolicyName)
                 .WithName(Name)
                 .WithTags("PassportVisa")
                 .Produces(StatusCodes.Status401Unauthorized)

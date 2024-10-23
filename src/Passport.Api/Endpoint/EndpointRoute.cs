@@ -4,13 +4,13 @@
     {
         private const string EndpointBase = "/api";
 
-        internal static class Authentication
+        public static class Authentication
         {
             public const string Token = $"{EndpointBase}/token";
             public const string RefreshToken = $"{EndpointBase}/refresh";
         }
 
-        internal static class Passport
+        public static class Passport
         {
             public const string Base = $"{EndpointBase}/passport";
             public const string Create = Base;
@@ -21,7 +21,7 @@
             public const string Register = $"{Base}/register";
         }
 
-        internal static class PassportHolder
+        public static class PassportHolder
         {
             private const string Base = $"{EndpointBase}/holder";
             public const string Create = Base;
@@ -32,7 +32,7 @@
             public const string ConfirmPhoneNumber = $"{Base}/confirm_phone";
         }
 
-        internal static class PassportToken
+        public static class PassportToken
         {
             public const string Base = $"{EndpointBase}/token";
             public const string Create = $"{Base}/add";
@@ -41,7 +41,7 @@
             public const string TwoFactorAuthentication = $"{Base}/tfa";
         }
 
-        internal static class PassportVisa
+        public static class PassportVisa
         {
             public const string Base = $"{EndpointBase}/visa";
             public const string Create = Base;

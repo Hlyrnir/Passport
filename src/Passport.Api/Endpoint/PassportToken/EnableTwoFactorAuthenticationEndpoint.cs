@@ -14,11 +14,11 @@ namespace Passport.Api.Endpoint.PassportToken
     {
         public const string Name = "EnableTwoFactorAuthentication";
 
-        public static void AddEnableTwoFactorAuthenticationEndpoint(this IEndpointRouteBuilder epBuilder)
+        public static void AddEnableTwoFactorAuthenticationEndpoint(this IEndpointRouteBuilder epBuilder, params string[] sPolicyName)
         {
             epBuilder.MapPut(
                 EndpointRoute.PassportToken.TwoFactorAuthentication, EnableTwoFactorAuthentication)
-                .RequireAuthorization(EndpointAuthorization.Passport)
+                .RequireAuthorization(sPolicyName)
                 .WithName(Name)
                 .WithTags("PassportToken")
                 .Produces(StatusCodes.Status401Unauthorized)

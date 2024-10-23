@@ -6,7 +6,6 @@ using Passport.Application.Extension;
 using Passport.Application.Interface;
 using Passport.Application.Result;
 using Passport.Application.Transfer;
-using Passport.Domain;
 
 namespace Passport.Application.Command.PassportToken.ResetCredential
 {

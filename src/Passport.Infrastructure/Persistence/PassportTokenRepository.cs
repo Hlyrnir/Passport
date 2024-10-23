@@ -5,7 +5,6 @@ using Passport.Application.Default;
 using Passport.Application.Interface;
 using Passport.Application.Result;
 using Passport.Application.Transfer;
-using Passport.Domain;
 using Passport.Infrastructure.Name;
 using Passport.Infrastructure.TypeHandler;
 

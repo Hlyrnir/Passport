@@ -5,7 +5,6 @@ using Passport.Application.Extension;
 using Passport.Application.Interface;
 using Passport.Application.Result;
 using Passport.Application.Transfer;
-using Passport.Domain;
 
 namespace Passport.Application.Command.PassportHolder.ConfirmPhoneNumber
 {
@@ -41,14 +40,15 @@ namespace Passport.Application.Command.PassportHolder.ConfirmPhoneNumber
                     if (dtoPassportHolder.ConcurrencyStamp != msgMessage.ConcurrencyStamp)
                         return new MessageResult<bool>(DefaultMessageError.ConcurrencyViolation);
 
-                    Domain.Aggregate.PassportHolder? ppHolder = dtoPassportHolder.Initialize(ppSetting);
+                    Domain.ValueObject.PassportHolderSetting ppHolderSetting = ppSetting.MapToPassportHolderSetting();
+                    Domain.Aggregate.PassportHolder? ppHolder = dtoPassportHolder.Initialize(ppHolderSetting);
 
                     if (ppHolder is null)
                         return new MessageResult<bool>(DomainError.InitializationHasFailed);
 
                     if (ppHolder.PhoneNumberIsConfirmed == false)
                     {
-                        if (ppHolder.TryConfirmPhoneNumber(msgMessage.PhoneNumber, ppSetting) == false)
+                        if (ppHolder.TryConfirmPhoneNumber(msgMessage.PhoneNumber, ppHolderSetting) == false)
                             return new MessageResult<bool>(new MessageError() { Code = DomainError.Code.Method, Description = "Phone number could not be confirmed." });
 
                         RepositoryResult<bool> rsltUpdate = await repoHolder.UpdateAsync(ppHolder.MapToTransferObject(), prvTime.GetUtcNow(), tknCancellation);

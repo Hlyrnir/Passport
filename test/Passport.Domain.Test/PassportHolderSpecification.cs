@@ -2,13 +2,6 @@
 {
     public class PassportHolderSpecification
     {
-        private readonly IPassportSetting ppSetting;
-
-        public PassportHolderSpecification()
-        {
-            ppSetting = DataFaker.PassportSetting.Create();
-        }
-
         [Theory]
         [InlineData(false, null)]
         [InlineData(false, "")]
@@ -24,7 +17,7 @@
             // Arrange
             bool bIsChanged = false;
 
-            Domain.Aggregate.PassportHolder ppHolder = DataFaker.PassportHolder.CreateDefault(ppSetting);
+            Domain.Aggregate.PassportHolder ppHolder = DataFaker.PassportHolder.CreateDefault();
 
             // Act
             bIsChanged = ppHolder.TryChangeCultureName(sCultureName!);
@@ -39,7 +32,7 @@
             // Arrange
             bool bIsChanged = false;
 
-            Domain.Aggregate.PassportHolder ppHolder = DataFaker.PassportHolder.CreateDefault(ppSetting);
+            Domain.Aggregate.PassportHolder ppHolder = DataFaker.PassportHolder.CreateDefault();
 
             // Act
             bIsChanged = ppHolder.TryChangeCultureName("DE-CH");
@@ -67,10 +60,35 @@
             // Arrange
             bool bIsChanged = false;
 
-            Domain.Aggregate.PassportHolder ppHolder = DataFaker.PassportHolder.CreateDefault(ppSetting);
+            Domain.ValueObject.PassportHolderSetting ppHolderSetting = DataFaker.PassportHolder.Setting;
+            Domain.Aggregate.PassportHolder ppHolder = DataFaker.PassportHolder.CreateDefault();
 
             // Act
-            bIsChanged = ppHolder.TryChangeEmailAddress(sEmailAddress!, ppSetting);
+            bIsChanged = ppHolder.TryChangeEmailAddress(sEmailAddress!, ppHolderSetting);
+
+            // Assert
+            Assert.Equal(bResult, bIsChanged);
+        }
+
+        [Theory]
+        [InlineData(false, null)]
+        [InlineData(false, "")]
+        [InlineData(false, " ")]
+        [InlineData(false, "0")]
+        [InlineData(false, "00")]
+        [InlineData(false, "000")]
+        [InlineData(false, "0000")]
+        [InlineData(true, "00000")]
+        public void ChangePhoneNumberShouldSucceed(bool bResult, string? sEmailAddress)
+        {
+            // Arrange
+            bool bIsChanged = false;
+
+            Domain.ValueObject.PassportHolderSetting ppHolderSetting = DataFaker.PassportHolder.Setting;
+            Domain.Aggregate.PassportHolder ppHolder = DataFaker.PassportHolder.CreateDefault();
+
+            // Act
+            bIsChanged = ppHolder.TryChangePhoneNumber(sEmailAddress!, ppHolderSetting);
 
             // Assert
             Assert.Equal(bResult, bIsChanged);

@@ -5,7 +5,6 @@ using Passport.Application.Default;
 using Passport.Application.Extension;
 using Passport.Application.Interface;
 using Passport.Application.Result;
-using Passport.Domain;
 
 namespace Passport.Application.Command.Passport.Register
 {
@@ -41,13 +40,14 @@ namespace Passport.Application.Command.Passport.Register
             if (tknCancellation.IsCancellationRequested)
                 return new MessageResult<Guid>(DefaultMessageError.TaskAborted);
 
+            Domain.ValueObject.PassportHolderSetting ppHolderSetting = ppSetting.MapToPassportHolderSetting();
             Domain.Aggregate.PassportHolder? ppHolder = Domain.Aggregate.PassportHolder.Create(
                 sCultureName: cmdRegisterPassport.CultureName,
                 sEmailAddress: cmdRegisterPassport.EmailAddress,
                 sFirstName: cmdRegisterPassport.FirstName,
                 sLastName: cmdRegisterPassport.LastName,
                 sPhoneNumber: cmdRegisterPassport.PhoneNumber,
-                ppSetting: ppSetting);
+                ppSetting: ppHolderSetting);
 
             if (ppHolder is null)
                 return new MessageResult<Guid>(new MessageError() { Code = DomainError.Code.Method, Description = "Holder has not been created." });

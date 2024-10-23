@@ -20,7 +20,7 @@ namespace Passport.Application.Test.Query.PassportHolderById
         public async Task Update_ShouldReturnPassportHolder_WhenHolderExists()
         {
             // Arrange
-            Domain.Aggregate.PassportHolder ppHolder = DataFaker.PassportHolder.CreateDefault(fxtPassport.PassportSetting);
+            Domain.Aggregate.PassportHolder ppHolder = DataFaker.PassportHolder.CreateDefault();
 
             await fxtPassport.PassportHolderRepository.InsertAsync(ppHolder.MapToTransferObject(), prvTime.GetUtcNow(), CancellationToken.None);
 
