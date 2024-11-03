@@ -36,6 +36,7 @@ namespace Passport.Application.Default
         {
             public static MessageError IsDisabled = new MessageError() { Code = Code.Method, Description = "Passport is disabled." };
             public static MessageError IsExpired = new MessageError() { Code = Code.Method, Description = "Passport is expired." };
+            public static MessageError NotAuthorized = new MessageError() { Code = Code.Method, Description = "Passport is not authorized." };
         }
 
         public static class PassportVisa

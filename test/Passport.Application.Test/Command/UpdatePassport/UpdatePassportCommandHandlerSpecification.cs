@@ -25,11 +25,8 @@ namespace Passport.Application.Test.Command.UpdatePassport
         {
             // Arrange
             Domain.Aggregate.Passport ppPassport = DataFaker.Passport.CreateDefault();
-            Domain.Aggregate.Passport ppAuthority = DataFaker.Passport.CreateAuthority();
             IPassportCredential ppCredential = DataFaker.PassportCredential.CreateDefault();
 
-            ppPassport.TryEnable(ppAuthority, prvTime.GetUtcNow());
-            ppPassport.TryJoinToAuthority(ppAuthority, prvTime.GetUtcNow());
             await fxtPassport.PassportRepository.InsertAsync(ppPassport.MapToTransferObject(), prvTime.GetUtcNow(), CancellationToken.None);
 
             UpdatePassportCommand cmdUpdate = new UpdatePassportCommand()
@@ -39,7 +36,7 @@ namespace Passport.Application.Test.Command.UpdatePassport
                 IsAuthority = ppPassport.IsAuthority,
                 IsEnabled = ppPassport.IsEnabled,
                 LastCheckedAt = prvTime.GetUtcNow(),
-                LastCheckedBy = Guid.NewGuid(),
+                LastCheckedBy = ppPassport.Id,
                 PassportIdToUpdate = ppPassport.Id,
                 PassportVisaId = ppPassport.VisaId,
                 CredentialToVerify = ppCredential,
@@ -73,8 +70,8 @@ namespace Passport.Application.Test.Command.UpdatePassport
                         dtoPassportInRepository =>
                         {
                             dtoPassportInRepository.ExpiredAt.Should().Be(ppPassport.ExpiredAt.AddDays(1));
-                            dtoPassportInRepository.IsAuthority.Should().Be(true);
-                            dtoPassportInRepository.IsEnabled.Should().Be(true);
+                            dtoPassportInRepository.IsAuthority.Should().Be(ppPassport.IsAuthority);
+                            dtoPassportInRepository.IsEnabled.Should().Be(ppPassport.IsEnabled);
                             dtoPassportInRepository.LastCheckedAt.Should().Be(prvTime.GetUtcNow());
                             dtoPassportInRepository.LastCheckedBy.Should().Be(ppPassport.Id);
                             dtoPassportInRepository.VisaId.Should().BeEmpty();
@@ -92,11 +89,8 @@ namespace Passport.Application.Test.Command.UpdatePassport
         {
             // Arrange
             Domain.Aggregate.Passport ppPassport = DataFaker.Passport.CreateDefault();
-            Domain.Aggregate.Passport ppAuthority = DataFaker.Passport.CreateAuthority();
             IPassportCredential ppCredential = DataFaker.PassportCredential.CreateDefault();
 
-            ppPassport.TryEnable(ppAuthority, prvTime.GetUtcNow());
-            ppPassport.TryJoinToAuthority(ppAuthority, prvTime.GetUtcNow());
             await fxtPassport.PassportRepository.InsertAsync(ppPassport.MapToTransferObject(), prvTime.GetUtcNow(), CancellationToken.None);
 
             string sObsoleteConcurrencyStamp = Guid.NewGuid().ToString();
@@ -108,7 +102,7 @@ namespace Passport.Application.Test.Command.UpdatePassport
                 IsAuthority = ppPassport.IsAuthority,
                 IsEnabled = ppPassport.IsEnabled,
                 LastCheckedAt = prvTime.GetUtcNow(),
-                LastCheckedBy = Guid.NewGuid(),
+                LastCheckedBy = ppPassport.Id,
                 PassportIdToUpdate = ppPassport.Id,
                 PassportVisaId = ppPassport.VisaId,
                 CredentialToVerify = ppCredential,
@@ -159,7 +153,7 @@ namespace Passport.Application.Test.Command.UpdatePassport
                 IsAuthority = ppPassport.IsAuthority,
                 IsEnabled = true,
                 LastCheckedAt = prvTime.GetUtcNow(),
-                LastCheckedBy = Guid.NewGuid(),
+                LastCheckedBy = ppPassport.Id,
                 PassportIdToUpdate = ppPassport.Id,
                 PassportVisaId = ppPassport.VisaId,
                 CredentialToVerify = ppCredential,
@@ -214,7 +208,7 @@ namespace Passport.Application.Test.Command.UpdatePassport
                 IsAuthority = true,
                 IsEnabled = ppPassport.IsEnabled,
                 LastCheckedAt = prvTime.GetUtcNow(),
-                LastCheckedBy = Guid.NewGuid(),
+                LastCheckedBy = ppPassport.Id,
                 PassportIdToUpdate = ppPassport.Id,
                 PassportVisaId = ppPassport.VisaId,
                 CredentialToVerify = ppCredential,
@@ -248,6 +242,313 @@ namespace Passport.Application.Test.Command.UpdatePassport
                 });
 
             //Clean up
+            await fxtPassport.PassportRepository.DeleteAsync(ppPassport.MapToTransferObject(), CancellationToken.None);
+        }
+
+        [Fact]
+        public async Task Update_ShouldReturnTrue_WhenPassportVisaIsAdded()
+        {
+            // Arrange
+            Domain.Aggregate.Passport ppPassport = DataFaker.Passport.CreateDefault();
+            Domain.Aggregate.Passport ppAuthority = DataFaker.Passport.CreateAuthority();
+            IPassportCredential ppCredential = DataFaker.PassportCredential.CreateDefault();
+
+            Domain.Aggregate.PassportVisa ppVisaToAdd = DataFaker.PassportVisa.CreateDefault(
+                sName: Guid.NewGuid().ToString(),
+                iLevel: 0);
+
+            ppPassport.TryEnable(ppAuthority, prvTime.GetUtcNow());
+            await fxtPassport.PassportRepository.InsertAsync(ppPassport.MapToTransferObject(), prvTime.GetUtcNow(), CancellationToken.None);
+            await fxtPassport.PassportRepository.InsertAsync(ppAuthority.MapToTransferObject(), prvTime.GetUtcNow(), CancellationToken.None);
+            await fxtPassport.PassportVisaRepository.InsertAsync(ppVisaToAdd.MapToTransferObject(), prvTime.GetUtcNow(), CancellationToken.None);
+
+            IEnumerable<Guid> enumPassportVisaId = new List<Guid>() { ppVisaToAdd.Id };
+
+            UpdatePassportCommand cmdUpdate = new UpdatePassportCommand()
+            {
+                ConcurrencyStamp = ppPassport.ConcurrencyStamp,
+                ExpiredAt = ppPassport.ExpiredAt.AddDays(1),
+                IsAuthority = ppPassport.IsAuthority,
+                IsEnabled = ppPassport.IsEnabled,
+                LastCheckedAt = prvTime.GetUtcNow(),
+                LastCheckedBy = ppAuthority.Id,
+                PassportIdToUpdate = ppPassport.Id,
+                PassportVisaId = enumPassportVisaId,
+                CredentialToVerify = ppCredential,
+                RestrictedPassportId = ppAuthority.Id
+            };
+
+            UpdatePassportCommandHandler hdlCommand = new UpdatePassportCommandHandler(
+                prvTime: prvTime,
+                repoPassport: fxtPassport.PassportRepository,
+                repoVisa: fxtPassport.PassportVisaRepository);
+
+            // Act
+            IMessageResult<bool> rsltUpdate = await hdlCommand.Handle(cmdUpdate, CancellationToken.None);
+
+            //Assert
+            await rsltUpdate.MatchAsync(
+                msgError =>
+                {
+                    msgError.Should().BeNull();
+
+                    return false;
+                },
+                async bResult =>
+                {
+                    bResult.Should().BeTrue();
+
+                    RepositoryResult<PassportTransferObject> rsltPassport = await fxtPassport.PassportRepository.FindByIdAsync(ppPassport.Id, CancellationToken.None);
+
+                    return rsltPassport.Match(
+                        msgError => false,
+                        dtoPassportInRepository =>
+                        {
+                            dtoPassportInRepository.ExpiredAt.Should().Be(ppPassport.ExpiredAt.AddDays(1));
+                            dtoPassportInRepository.IsAuthority.Should().Be(false);
+                            dtoPassportInRepository.IsEnabled.Should().Be(true);
+                            dtoPassportInRepository.LastCheckedAt.Should().Be(prvTime.GetUtcNow());
+                            dtoPassportInRepository.LastCheckedBy.Should().Be(ppAuthority.Id);
+                            dtoPassportInRepository.VisaId.Should().ContainEquivalentOf(ppVisaToAdd.Id);
+
+                            return true;
+                        });
+                });
+
+            //Clean up
+            await fxtPassport.PassportVisaRepository.DeleteAsync(ppVisaToAdd.MapToTransferObject(), CancellationToken.None);
+            await fxtPassport.PassportRepository.DeleteAsync(ppAuthority.MapToTransferObject(), CancellationToken.None);
+            await fxtPassport.PassportRepository.DeleteAsync(ppPassport.MapToTransferObject(), CancellationToken.None);
+        }
+
+        [Fact]
+        public async Task Update_ShouldReturnTrue_WhenPassportVisaIsRemoved()
+        {
+            // Arrange
+            Domain.Aggregate.Passport ppPassport = DataFaker.Passport.CreateDefault();
+            Domain.Aggregate.Passport ppAuthority = DataFaker.Passport.CreateAuthority();
+            IPassportCredential ppCredential = DataFaker.PassportCredential.CreateDefault();
+
+            Domain.Aggregate.PassportVisa ppVisa = DataFaker.PassportVisa.CreateDefault(
+                sName: Guid.NewGuid().ToString(),
+                iLevel: 0);
+
+            ppPassport.TryEnable(ppAuthority, prvTime.GetUtcNow());
+            ppPassport.TryAddVisa(ppVisa);
+            await fxtPassport.PassportRepository.InsertAsync(ppPassport.MapToTransferObject(), prvTime.GetUtcNow(), CancellationToken.None);
+            await fxtPassport.PassportRepository.InsertAsync(ppAuthority.MapToTransferObject(), prvTime.GetUtcNow(), CancellationToken.None);
+            await fxtPassport.PassportVisaRepository.InsertAsync(ppVisa.MapToTransferObject(), prvTime.GetUtcNow(), CancellationToken.None);
+
+            IEnumerable<Guid> enumPassportVisaId = Enumerable.Empty<Guid>();
+
+            UpdatePassportCommand cmdUpdate = new UpdatePassportCommand()
+            {
+                ConcurrencyStamp = ppPassport.ConcurrencyStamp,
+                ExpiredAt = ppPassport.ExpiredAt.AddDays(1),
+                IsAuthority = ppPassport.IsAuthority,
+                IsEnabled = ppPassport.IsEnabled,
+                LastCheckedAt = prvTime.GetUtcNow(),
+                LastCheckedBy = ppAuthority.Id,
+                PassportIdToUpdate = ppPassport.Id,
+                PassportVisaId = enumPassportVisaId,
+                CredentialToVerify = ppCredential,
+                RestrictedPassportId = ppAuthority.Id
+            };
+
+            UpdatePassportCommandHandler hdlCommand = new UpdatePassportCommandHandler(
+                prvTime: prvTime,
+                repoPassport: fxtPassport.PassportRepository,
+                repoVisa: fxtPassport.PassportVisaRepository);
+
+            // Act
+            IMessageResult<bool> rsltUpdate = await hdlCommand.Handle(cmdUpdate, CancellationToken.None);
+
+            //Assert
+            await rsltUpdate.MatchAsync(
+                msgError =>
+                {
+                    msgError.Should().BeNull();
+
+                    return false;
+                },
+                async bResult =>
+                {
+                    bResult.Should().BeTrue();
+
+                    RepositoryResult<PassportTransferObject> rsltPassport = await fxtPassport.PassportRepository.FindByIdAsync(ppPassport.Id, CancellationToken.None);
+
+                    return rsltPassport.Match(
+                        msgError => false,
+                        dtoPassportInRepository =>
+                        {
+                            dtoPassportInRepository.ExpiredAt.Should().Be(ppPassport.ExpiredAt.AddDays(1));
+                            dtoPassportInRepository.IsAuthority.Should().Be(false);
+                            dtoPassportInRepository.IsEnabled.Should().Be(true);
+                            dtoPassportInRepository.LastCheckedAt.Should().Be(prvTime.GetUtcNow());
+                            dtoPassportInRepository.LastCheckedBy.Should().Be(ppAuthority.Id);
+                            dtoPassportInRepository.VisaId.Should().NotContainEquivalentOf(ppVisa.Id);
+
+                            return true;
+                        });
+                });
+
+            //Clean up
+            await fxtPassport.PassportVisaRepository.DeleteAsync(ppVisa.MapToTransferObject(), CancellationToken.None);
+            await fxtPassport.PassportRepository.DeleteAsync(ppAuthority.MapToTransferObject(), CancellationToken.None);
+            await fxtPassport.PassportRepository.DeleteAsync(ppPassport.MapToTransferObject(), CancellationToken.None);
+        }
+
+        [Fact]
+        public async Task Update_ShouldReturnTrue_WhenPassportVisaIsUpdated()
+        {
+            // Arrange
+            Domain.Aggregate.Passport ppPassport = DataFaker.Passport.CreateDefault();
+            Domain.Aggregate.Passport ppAuthority = DataFaker.Passport.CreateAuthority();
+            IPassportCredential ppCredential = DataFaker.PassportCredential.CreateDefault();
+
+            Domain.Aggregate.PassportVisa ppVisa = DataFaker.PassportVisa.CreateDefault(
+                sName: Guid.NewGuid().ToString(),
+                iLevel: 0);
+
+            ppPassport.TryEnable(ppAuthority, prvTime.GetUtcNow());
+            ppPassport.TryAddVisa(ppVisa);
+            await fxtPassport.PassportRepository.InsertAsync(ppPassport.MapToTransferObject(), prvTime.GetUtcNow(), CancellationToken.None);
+            await fxtPassport.PassportRepository.InsertAsync(ppAuthority.MapToTransferObject(), prvTime.GetUtcNow(), CancellationToken.None);
+            await fxtPassport.PassportVisaRepository.InsertAsync(ppVisa.MapToTransferObject(), prvTime.GetUtcNow(), CancellationToken.None);
+
+            IEnumerable<Guid> enumPassportVisaId = new List<Guid>() { ppVisa.Id };
+
+            UpdatePassportCommand cmdUpdate = new UpdatePassportCommand()
+            {
+                ConcurrencyStamp = ppPassport.ConcurrencyStamp,
+                ExpiredAt = ppPassport.ExpiredAt.AddDays(1),
+                IsAuthority = ppPassport.IsAuthority,
+                IsEnabled = ppPassport.IsEnabled,
+                LastCheckedAt = prvTime.GetUtcNow(),
+                LastCheckedBy = ppAuthority.Id,
+                PassportIdToUpdate = ppPassport.Id,
+                PassportVisaId = enumPassportVisaId,
+                CredentialToVerify = ppCredential,
+                RestrictedPassportId = ppAuthority.Id
+            };
+
+            UpdatePassportCommandHandler hdlCommand = new UpdatePassportCommandHandler(
+                prvTime: prvTime,
+                repoPassport: fxtPassport.PassportRepository,
+                repoVisa: fxtPassport.PassportVisaRepository);
+
+            // Act
+            IMessageResult<bool> rsltUpdate = await hdlCommand.Handle(cmdUpdate, CancellationToken.None);
+
+            //Assert
+            await rsltUpdate.MatchAsync(
+                msgError =>
+                {
+                    msgError.Should().BeNull();
+
+                    return false;
+                },
+                async bResult =>
+                {
+                    bResult.Should().BeTrue();
+
+                    RepositoryResult<PassportTransferObject> rsltPassport = await fxtPassport.PassportRepository.FindByIdAsync(ppPassport.Id, CancellationToken.None);
+
+                    return rsltPassport.Match(
+                        msgError => false,
+                        dtoPassportInRepository =>
+                        {
+                            dtoPassportInRepository.ExpiredAt.Should().Be(ppPassport.ExpiredAt.AddDays(1));
+                            dtoPassportInRepository.IsAuthority.Should().Be(false);
+                            dtoPassportInRepository.IsEnabled.Should().Be(true);
+                            dtoPassportInRepository.LastCheckedAt.Should().Be(prvTime.GetUtcNow());
+                            dtoPassportInRepository.LastCheckedBy.Should().Be(ppAuthority.Id);
+                            dtoPassportInRepository.VisaId.Should().ContainEquivalentOf(ppVisa.Id);
+
+                            return true;
+                        });
+                });
+
+            //Clean up
+            await fxtPassport.PassportVisaRepository.DeleteAsync(ppVisa.MapToTransferObject(), CancellationToken.None);
+            await fxtPassport.PassportRepository.DeleteAsync(ppAuthority.MapToTransferObject(), CancellationToken.None);
+            await fxtPassport.PassportRepository.DeleteAsync(ppPassport.MapToTransferObject(), CancellationToken.None);
+        }
+
+        [Fact]
+        public async Task Update_ShouldReturnTrue_WhenPassportVisaIsDuplicated()
+        {
+            // Arrange
+            Domain.Aggregate.Passport ppPassport = DataFaker.Passport.CreateDefault();
+            Domain.Aggregate.Passport ppAuthority = DataFaker.Passport.CreateAuthority();
+            IPassportCredential ppCredential = DataFaker.PassportCredential.CreateDefault();
+
+            Domain.Aggregate.PassportVisa ppVisa = DataFaker.PassportVisa.CreateDefault(
+                sName: Guid.NewGuid().ToString(),
+                iLevel: 0);
+
+            ppPassport.TryEnable(ppAuthority, prvTime.GetUtcNow());
+            ppPassport.TryAddVisa(ppVisa);
+            await fxtPassport.PassportRepository.InsertAsync(ppPassport.MapToTransferObject(), prvTime.GetUtcNow(), CancellationToken.None);
+            await fxtPassport.PassportRepository.InsertAsync(ppAuthority.MapToTransferObject(), prvTime.GetUtcNow(), CancellationToken.None);
+            await fxtPassport.PassportVisaRepository.InsertAsync(ppVisa.MapToTransferObject(), prvTime.GetUtcNow(), CancellationToken.None);
+
+            IEnumerable<Guid> enumPassportVisaId = new List<Guid>() { ppVisa.Id, ppVisa.Id };
+
+            UpdatePassportCommand cmdUpdate = new UpdatePassportCommand()
+            {
+                ConcurrencyStamp = ppPassport.ConcurrencyStamp,
+                ExpiredAt = ppPassport.ExpiredAt.AddDays(1),
+                IsAuthority = ppPassport.IsAuthority,
+                IsEnabled = ppPassport.IsEnabled,
+                LastCheckedAt = prvTime.GetUtcNow(),
+                LastCheckedBy = ppAuthority.Id,
+                PassportIdToUpdate = ppPassport.Id,
+                PassportVisaId = enumPassportVisaId,
+                CredentialToVerify = ppCredential,
+                RestrictedPassportId = ppAuthority.Id
+            };
+
+            UpdatePassportCommandHandler hdlCommand = new UpdatePassportCommandHandler(
+                prvTime: prvTime,
+                repoPassport: fxtPassport.PassportRepository,
+                repoVisa: fxtPassport.PassportVisaRepository);
+
+            // Act
+            IMessageResult<bool> rsltUpdate = await hdlCommand.Handle(cmdUpdate, CancellationToken.None);
+
+            //Assert
+            await rsltUpdate.MatchAsync(
+                msgError =>
+                {
+                    msgError.Should().BeNull();
+
+                    return false;
+                },
+                async bResult =>
+                {
+                    bResult.Should().BeTrue();
+
+                    RepositoryResult<PassportTransferObject> rsltPassport = await fxtPassport.PassportRepository.FindByIdAsync(ppPassport.Id, CancellationToken.None);
+
+                    return rsltPassport.Match(
+                        msgError => false,
+                        dtoPassportInRepository =>
+                        {
+                            dtoPassportInRepository.ExpiredAt.Should().Be(ppPassport.ExpiredAt.AddDays(1));
+                            dtoPassportInRepository.IsAuthority.Should().Be(false);
+                            dtoPassportInRepository.IsEnabled.Should().Be(true);
+                            dtoPassportInRepository.LastCheckedAt.Should().Be(prvTime.GetUtcNow());
+                            dtoPassportInRepository.LastCheckedBy.Should().Be(ppAuthority.Id);
+                            dtoPassportInRepository.VisaId.Should().ContainEquivalentOf(ppVisa.Id);
+
+                            return true;
+                        });
+                });
+
+            //Clean up
+            await fxtPassport.PassportVisaRepository.DeleteAsync(ppVisa.MapToTransferObject(), CancellationToken.None);
+            await fxtPassport.PassportRepository.DeleteAsync(ppAuthority.MapToTransferObject(), CancellationToken.None);
             await fxtPassport.PassportRepository.DeleteAsync(ppPassport.MapToTransferObject(), CancellationToken.None);
         }
     }

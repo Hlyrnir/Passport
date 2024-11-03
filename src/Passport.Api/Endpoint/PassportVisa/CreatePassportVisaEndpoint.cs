@@ -51,7 +51,7 @@ namespace Passport.Api.Endpoint.PassportVisa
 
                     return Results.BadRequest($"{msgError.Code}: {msgError.Description}");
                 },
-                guPassportVisaId => TypedResults.CreatedAtRoute(FindPassportVisaByIdEndpoint.Name, new { guId = guPassportVisaId }));
+                guPassportVisaId => TypedResults.CreatedAtRoute(FindPassportVisaByIdEndpoint.Name, new { guPassportVisaIdToFind = guPassportVisaId }));
         }
 
         private static CreatePassportVisaCommand MapToCommand(this CreatePassportVisaRequest cmdRequest, Guid guPassportId)

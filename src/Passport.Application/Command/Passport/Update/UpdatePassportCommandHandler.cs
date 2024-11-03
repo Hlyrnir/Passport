@@ -44,11 +44,68 @@ namespace Passport.Application.Command.Passport.Update
                     if (ppPassport is null)
                         return new MessageResult<bool>(DomainError.InitializationHasFailed);
 
-                    if (msgMessage.IsAuthority == true || msgMessage.IsEnabled == true)
-                    {
-                        RepositoryResult<PassportTransferObject> rsltAuthorizedPassport = await repoPassport.FindByIdAsync(msgMessage.RestrictedPassportId, tknCancellation);
+                    if (ppPassport.TryExtendTerm(msgMessage.ExpiredAt, prvTime.GetUtcNow(), msgMessage.RestrictedPassportId) == false)
+                        return new MessageResult<bool>(new MessageError() { Code = DomainError.Code.Method, Description = $"Term of passport {ppPassport.Id} could not be extended." });
 
-                        MessageResult<bool> rsltPassportIsChanged = rsltAuthorizedPassport.Match(
+                    IDictionary<Guid, PassportVisaState> dictPassportVisaId = new Dictionary<Guid, PassportVisaState>();
+
+                    foreach (Guid guPassportVisaId in ppPassport.VisaId)
+                    {
+                        dictPassportVisaId.TryAdd(guPassportVisaId, PassportVisaState.PASSPORT_VISA_REMOVE);
+                    }
+
+                    foreach (Guid guPassportVisaId in msgMessage.PassportVisaId)
+                    {
+                        if (dictPassportVisaId.TryAdd(guPassportVisaId, PassportVisaState.PASSPORT_VISA_ADD) == false)
+                            dictPassportVisaId[guPassportVisaId] = PassportVisaState.PASSPORT_VISA_SKIP;
+                    }
+
+                    foreach (KeyValuePair<Guid, PassportVisaState> kvpPassportVisaId in dictPassportVisaId)
+                    {
+                        RepositoryResult<PassportVisaTransferObject> rsltVisa = await repoVisa.FindByIdAsync(kvpPassportVisaId.Key, tknCancellation);
+
+                        MessageResult<bool> rsltVisaIsUpdated = rsltVisa.Match(
+                            msgError => new MessageResult<bool>(new MessageError() { Code = msgError.Code, Description = msgError.Description }),
+                            dtoPassportVisa =>
+                            {
+                                Domain.Aggregate.PassportVisa? ppVisa = dtoPassportVisa.Initialize();
+
+                                if (ppVisa is null)
+                                    return new MessageResult<bool>(DomainError.InitializationHasFailed);
+
+                                switch (kvpPassportVisaId.Value)
+                                {
+                                    case PassportVisaState.PASSPORT_VISA_SKIP:
+                                        return true;
+
+                                    case PassportVisaState.PASSPORT_VISA_REMOVE:
+
+                                        if (ppPassport.TryRemoveVisa(ppVisa) == false)
+                                            return new MessageResult<bool>(new MessageError() { Code = DomainError.Code.Method, Description = $"Visa {ppVisa.Id} could not be removed from passport {ppPassport.Id}" });
+
+                                        break;
+                                    case PassportVisaState.PASSPORT_VISA_ADD:
+
+                                        if (ppPassport.TryAddVisa(ppVisa) == false)
+                                            return new MessageResult<bool>(new MessageError() { Code = DomainError.Code.Method, Description = $"Visa {ppVisa.Id} could not be added to passport {ppPassport.Id}" });
+
+                                        break;
+                                    default:
+                                        return new MessageResult<bool>(new MessageError() { Code = DomainError.Code.Method, Description = $"Passport {ppPassport.Id} could not be updated." });
+                                }
+
+                                return true;
+                            });
+
+                        if (rsltVisaIsUpdated.IsFailed)
+                            return rsltVisaIsUpdated;
+                    }
+
+                    if (ppPassport.IsAuthority != msgMessage.IsAuthority || ppPassport.IsEnabled != msgMessage.IsEnabled)
+                    {
+                        RepositoryResult<PassportTransferObject> rsltAuthority = await repoPassport.FindByIdAsync(msgMessage.RestrictedPassportId, tknCancellation);
+
+                        MessageResult<bool> rsltPassportIsUpdated = rsltAuthority.Match(
                             msgError => new MessageResult<bool>(new MessageError() { Code = msgError.Code, Description = msgError.Description }),
                             dtoAuthority =>
                             {
@@ -72,34 +129,8 @@ namespace Passport.Application.Command.Passport.Update
                                 return true;
                             });
 
-                        if (rsltPassportIsChanged.IsFailed)
-                            return rsltPassportIsChanged;
-                    }
-
-                    if (ppPassport.TryExtendTerm(msgMessage.ExpiredAt, prvTime.GetUtcNow(), msgMessage.RestrictedPassportId) == false)
-                        return new MessageResult<bool>(new MessageError() { Code = DomainError.Code.Method, Description = $"Term of passport {ppPassport.Id} could not be extended." });
-
-                    foreach (Guid guPassportVisa in msgMessage.PassportVisaId)
-                    {
-                        RepositoryResult<PassportVisaTransferObject> rsltVisa = await repoVisa.FindByIdAsync(guPassportVisa, tknCancellation);
-
-                        MessageResult<bool> rsltVisaIsAdded = rsltVisa.Match(
-                            msgError => new MessageResult<bool>(new MessageError() { Code = msgError.Code, Description = msgError.Description }),
-                            dtoPassportVisa =>
-                            {
-                                Domain.Aggregate.PassportVisa? ppVisa = dtoPassportVisa.Initialize();
-
-                                if (ppVisa is null)
-                                    return new MessageResult<bool>(DomainError.InitializationHasFailed);
-
-                                if (ppPassport.TryAddVisa(ppVisa) == false)
-                                    return new MessageResult<bool>(new MessageError() { Code = DomainError.Code.Method, Description = $"Visa {ppVisa} could not be added to passport {ppPassport.Id}" });
-
-                                return true;
-                            });
-
-                        if (rsltVisaIsAdded.IsFailed)
-                            return rsltVisaIsAdded;
+                        if (rsltPassportIsUpdated.IsFailed)
+                            return rsltPassportIsUpdated;
                     }
 
                     RepositoryResult<bool> rsltUpdate = await repoPassport.UpdateAsync(ppPassport.MapToTransferObject(), prvTime.GetUtcNow(), tknCancellation);
@@ -108,6 +139,13 @@ namespace Passport.Application.Command.Passport.Update
                         msgError => new MessageResult<bool>(new MessageError() { Code = msgError.Code, Description = msgError.Description }),
                         bResult => new MessageResult<bool>(bResult));
                 });
+        }
+
+        private enum PassportVisaState
+        {
+            PASSPORT_VISA_SKIP = 0,
+            PASSPORT_VISA_REMOVE = 1,
+            PASSPORT_VISA_ADD = 2
         }
     }
 }

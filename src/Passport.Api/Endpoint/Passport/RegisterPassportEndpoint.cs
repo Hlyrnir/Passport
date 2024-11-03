@@ -58,7 +58,7 @@ namespace Passport.Api.Endpoint.Passport
 
                     return Results.BadRequest($"{msgError.Code}: {msgError.Description}");
                 },
-                guPassportId => TypedResults.CreatedAtRoute(FindPassportByIdEndpoint.Name, new { guId = guPassportId }));
+                guPassportId => TypedResults.CreatedAtRoute(FindPassportByIdEndpoint.Name, new { guPassportIdToFind = guPassportId }));
         }
 
         private static RegisterPassportCommand MapToCommand(this RegisterPassportRequest cmdRequest, Guid guPassportId, IPassportCredential ppCredentialToRegister, IPassportCredential ppCredentialToVerify)
