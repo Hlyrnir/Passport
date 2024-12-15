@@ -2,13 +2,13 @@
 {
     public static class Passport
     {
-        public static readonly DateTimeOffset LastCheckedAt = new DateTimeOffset(2000, 1, 31, 0, 0, 0, 0, 0, TimeSpan.Zero);
+        public static readonly DateTimeOffset LastCheckedAt = new DateTimeOffset(2000, 1, 1, 0, 0, 0, 0, 0, TimeSpan.Zero);
 
         public static Domain.Aggregate.Passport CreateDefault()
         {
             Domain.Aggregate.Passport? ppPassport = Domain.Aggregate.Passport.Initialize(
             sConcurrencyStamp: Guid.NewGuid().ToString(),
-            dtExpiredAt: LastCheckedAt.AddDays(5),
+            dtExpiredAt: LastCheckedAt.AddDays(1),
             guHolderId: Guid.NewGuid(),
             guId: Guid.NewGuid(),
             bIsAuthority: false,
@@ -28,7 +28,7 @@
         {
             Domain.Aggregate.Passport? ppPassport = Domain.Aggregate.Passport.Initialize(
             sConcurrencyStamp: Guid.NewGuid().ToString(),
-            dtExpiredAt: LastCheckedAt.AddDays(30),
+            dtExpiredAt: LastCheckedAt.AddDays(1),
             guHolderId: Guid.NewGuid(),
             guId: Guid.NewGuid(),
             bIsAuthority: false,
@@ -48,7 +48,7 @@
         {
             Domain.Aggregate.Passport? ppPassport = Domain.Aggregate.Passport.Initialize(
             sConcurrencyStamp: Guid.NewGuid().ToString(),
-            dtExpiredAt: LastCheckedAt.AddDays(30),
+            dtExpiredAt: LastCheckedAt.AddDays(1),
             guHolderId: Guid.NewGuid(),
             guId: Guid.NewGuid(),
             bIsAuthority: true,

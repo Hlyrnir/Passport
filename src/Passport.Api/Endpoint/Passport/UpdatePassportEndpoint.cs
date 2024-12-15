@@ -32,6 +32,7 @@ namespace Passport.Api.Endpoint.Passport
         private static async Task<IResult> UpdatePassport(
             UpdatePassportRequest rqstPassport,
             IPassportCredential ppCredential,
+            TimeProvider prvTime,
             HttpContext httpContext,
             ISender mdtMediator,
             CancellationToken tknCancellation)
@@ -41,7 +42,7 @@ namespace Passport.Api.Endpoint.Passport
             if (httpContext.TryParsePassportId(out guPassportId) == false)
                 return Results.BadRequest("Passport could not be identified.");
 
-            UpdatePassportCommand cmdUpdate = rqstPassport.MapToCommand(guPassportId, ppCredential);
+            UpdatePassportCommand cmdUpdate = rqstPassport.MapToCommand(guPassportId, ppCredential, prvTime);
 
             IMessageResult<bool> mdtResult = await mdtMediator.Send(cmdUpdate, tknCancellation);
 
@@ -56,7 +57,7 @@ namespace Passport.Api.Endpoint.Passport
                 bResult => TypedResults.Ok(bResult));
         }
 
-        private static UpdatePassportCommand MapToCommand(this UpdatePassportRequest rqstPassport, Guid guPassportId, IPassportCredential ppCredential)
+        private static UpdatePassportCommand MapToCommand(this UpdatePassportRequest rqstPassport, Guid guPassportId, IPassportCredential ppCredential, TimeProvider prvTime)
         {
             ppCredential.Initialize(
                 sProvider: rqstPassport.ProviderToVerify,
@@ -70,9 +71,9 @@ namespace Passport.Api.Endpoint.Passport
                 ExpiredAt = rqstPassport.ExpiredAt,
                 IsAuthority = rqstPassport.IsAuthority,
                 IsEnabled = rqstPassport.IsEnabled,
-                LastCheckedAt = rqstPassport.LastCheckedAt,
-                LastCheckedBy = rqstPassport.LastCheckedBy,
-                PassportVisaId = rqstPassport.PassportVisa,
+                LastCheckedAt = prvTime.GetUtcNow(),
+                LastCheckedBy = guPassportId,
+                PassportVisaId = rqstPassport.PassportVisaId,
                 CredentialToVerify = ppCredential,
                 RestrictedPassportId = guPassportId
             };

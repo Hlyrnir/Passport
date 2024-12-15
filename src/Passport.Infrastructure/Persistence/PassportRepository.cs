@@ -240,9 +240,9 @@ namespace Passport.Infrastructure.Persistence
                 if (dtoPassport.VisaId.Count() == 0)
                     return new RepositoryResult<bool>(true);
 
-                int iVisaIdResult = await RegisterPassportVisaAsync(dtoPassport, dtCreatedAt, tknCancellation);
+                bool bIsRegistered = await RegisterPassportVisaAsync(dtoPassport, dtCreatedAt, tknCancellation);
 
-                if (iVisaIdResult < 1)
+                if (bIsRegistered == false)
                     return new RepositoryResult<bool>(new RepositoryError()
                     {
                         Code = DefaultRepositoryError.Code.Method,
@@ -315,9 +315,9 @@ namespace Passport.Infrastructure.Persistence
                 if (dtoPassport.VisaId.Count() == 0)
                     return new RepositoryResult<bool>(true);
 
-                int iVisaIdResult = await RegisterPassportVisaAsync(dtoPassport, dtEditedAt, tknCancellation);
+                bool bIsRegistered = await RegisterPassportVisaAsync(dtoPassport, dtEditedAt, tknCancellation);
 
-                if (iVisaIdResult < 1)
+                if (bIsRegistered == false)
                     return new RepositoryResult<bool>(new RepositoryError()
                     {
                         Code = DefaultRepositoryError.Code.Method,
@@ -336,7 +336,7 @@ namespace Passport.Infrastructure.Persistence
             }
         }
 
-        private async Task<int> RegisterPassportVisaAsync(
+        private async Task<bool> RegisterPassportVisaAsync(
             PassportTransferObject dtoPassport,
             DateTimeOffset dtRegisteredAt,
             CancellationToken tknCancellation)
@@ -391,10 +391,12 @@ namespace Passport.Infrastructure.Persistence
                 lstParameter.Add(dpParameterToList);
             }
 
-            return await sqlDataAccess.Connection.ExecuteAsync(
+            await sqlDataAccess.Connection.ExecuteAsync(
                 sql: sInsertStatement,
                 param: lstParameter,
                 transaction: sqlDataAccess.Transaction);
+
+            return true;
         }
     }
 }

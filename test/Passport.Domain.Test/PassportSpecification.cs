@@ -112,7 +112,7 @@ namespace Passport.Domain.Test
             ppAuthorizedPassport.TryEnable(ppAuthority, dtEnabledAt);
 
             // Act
-            DateTimeOffset dtDisabledAt = DataFaker.Passport.LastCheckedAt.AddDays(5);
+            DateTimeOffset dtDisabledAt = DataFaker.Passport.LastCheckedAt;
 
             bool bResult = ppPassport.TryDisable(ppAuthorizedPassport, dtDisabledAt);
 

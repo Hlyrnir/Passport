@@ -79,7 +79,7 @@ namespace Passport.Application.Test.Command.AuthenticationTokenByCredential
             // Arrange
             Domain.Aggregate.Passport ppAutority = DataFaker.Passport.CreateAuthority();
             Domain.Aggregate.Passport ppPassport = DataFaker.Passport.CreateDefault();
-            ppPassport.TryDisable(ppAutority, ppPassport.ExpiredAt.AddDays(-1));
+            ppPassport.TryDisable(ppAutority, ppPassport.ExpiredAt);
             Domain.Aggregate.PassportToken ppToken = DataFaker.PassportToken.CreateDefault(ppPassport.Id);
             IPassportCredential ppCredential = DataFaker.PassportCredential.CreateDefault();
 

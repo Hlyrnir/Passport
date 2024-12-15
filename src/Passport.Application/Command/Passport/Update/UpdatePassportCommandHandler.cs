@@ -44,9 +44,6 @@ namespace Passport.Application.Command.Passport.Update
                     if (ppPassport is null)
                         return new MessageResult<bool>(DomainError.InitializationHasFailed);
 
-                    if (ppPassport.TryExtendTerm(msgMessage.ExpiredAt, prvTime.GetUtcNow(), msgMessage.RestrictedPassportId) == false)
-                        return new MessageResult<bool>(new MessageError() { Code = DomainError.Code.Method, Description = $"Term of passport {ppPassport.Id} could not be extended." });
-
                     IDictionary<Guid, PassportVisaState> dictPassportVisaId = new Dictionary<Guid, PassportVisaState>();
 
                     foreach (Guid guPassportVisaId in ppPassport.VisaId)
@@ -101,7 +98,13 @@ namespace Passport.Application.Command.Passport.Update
                             return rsltVisaIsUpdated;
                     }
 
-                    if (ppPassport.IsAuthority != msgMessage.IsAuthority || ppPassport.IsEnabled != msgMessage.IsEnabled)
+                    if (ppPassport.ExpiredAt != msgMessage.ExpiredAt)
+                    {
+                        if (ppPassport.TryExtendTerm(msgMessage.ExpiredAt, prvTime.GetUtcNow(), msgMessage.RestrictedPassportId) == false)
+                            return new MessageResult<bool>(new MessageError() { Code = DomainError.Code.Method, Description = $"Term of passport {ppPassport.Id} could not be extended." });
+                    }
+
+                    if (ppPassport.IsEnabled != msgMessage.IsEnabled || ppPassport.IsAuthority != msgMessage.IsAuthority)
                     {
                         RepositoryResult<PassportTransferObject> rsltAuthority = await repoPassport.FindByIdAsync(msgMessage.RestrictedPassportId, tknCancellation);
 
@@ -114,16 +117,28 @@ namespace Passport.Application.Command.Passport.Update
                                 if (ppAuthority is null)
                                     return new MessageResult<bool>(DomainError.InitializationHasFailed);
 
+                                if (ppPassport.IsEnabled == false && msgMessage.IsEnabled == true)
+                                {
+                                    if (ppPassport.TryEnable(ppAuthority, prvTime.GetUtcNow()) == false)
+                                        return new MessageResult<bool>(new MessageError() { Code = DomainError.Code.Method, Description = $"Passport {ppPassport.Id} is not enabled." });
+                                }
+
+                                if (ppPassport.IsEnabled == true && msgMessage.IsEnabled == false)
+                                {
+                                    if (ppPassport.TryDisable(ppAuthority, prvTime.GetUtcNow()) == false)
+                                        return new MessageResult<bool>(new MessageError() { Code = DomainError.Code.Method, Description = $"Passport {ppPassport.Id} is not disabled." });
+                                }
+
                                 if (ppPassport.IsAuthority == false && msgMessage.IsAuthority == true)
                                 {
                                     if (ppPassport.TryJoinToAuthority(ppAuthority, prvTime.GetUtcNow()) == false)
                                         return new MessageResult<bool>(new MessageError() { Code = DomainError.Code.Method, Description = $"Passport {ppPassport.Id} could not join to authority." });
                                 }
 
-                                if (ppPassport.IsEnabled == false && msgMessage.IsEnabled == true)
+                                if (ppPassport.IsAuthority == true && msgMessage.IsAuthority == false)
                                 {
-                                    if (ppPassport.TryEnable(ppAuthority, prvTime.GetUtcNow()) == false)
-                                        return new MessageResult<bool>(new MessageError() { Code = DomainError.Code.Method, Description = $"Passport {ppPassport.Id} is not enabled." });
+                                    if (ppPassport.TryReset(ppAuthority, prvTime.GetUtcNow()) == false)
+                                        return new MessageResult<bool>(new MessageError() { Code = DomainError.Code.Method, Description = $"Passport {ppPassport.Id} could not be reset." });
                                 }
 
                                 return true;

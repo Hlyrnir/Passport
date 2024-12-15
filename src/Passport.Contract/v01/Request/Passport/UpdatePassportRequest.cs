@@ -7,8 +7,6 @@
         public required DateTimeOffset ExpiredAt { get; init; }
         public required bool IsEnabled { get; init; }
         public required bool IsAuthority { get; init; }
-        public required DateTimeOffset LastCheckedAt { get; init; }
-        public required Guid LastCheckedBy { get; init; }
-        public required IEnumerable<Guid> PassportVisa { get; init; }
+        public required IEnumerable<Guid> PassportVisaId { get; init; }
     }
 }
