@@ -5,6 +5,11 @@ using Passport.Application.Result;
 
 namespace Passport.Application.Validation
 {
+    /// <summary>
+    /// Important: <see cref="TResponse"/> is implemented as <see cref="IMessageResult{TResponse}"/>
+    /// </summary>
+    /// <typeparam name="TMessage"></typeparam>
+    /// <typeparam name="TResponse">Do not use IMessageResult!</typeparam>
     internal sealed class MessageValidationBehaviour<TMessage, TResponse> : IPipelineBehavior<TMessage, IMessageResult<TResponse>>
         where TMessage : notnull, IMessage
     {

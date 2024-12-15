@@ -28,7 +28,6 @@ using Passport.Application.Query.PassportHolder.ById;
 using Passport.Application.Query.PassportVisa.ById;
 using Passport.Application.Query.PassportVisa.ByPassportId;
 using Passport.Application.Validation;
-using Passport.Domain;
 
 namespace Passport.Application
 {
@@ -39,17 +38,7 @@ namespace Passport.Application
             cltService.TryAddTransient<IPassportCredential, PassportCredential>();
             cltService.TryAddTransient<IPassportValidation, PassportValidation>();
 
-            #region Authentication - Mediator
-
-            //cltService.TryAddScoped<AuthenticationTokenByCredentialCommandHandler>();
-
-            //cltService.Add(new ServiceDescriptor(
-            //    typeof(ICommandHandler<AuthenticationTokenByCredentialCommand, MessageResult<AuthenticationTokenTransferObject>>),
-            //    prvService => prvService.GetRequiredService<AuthenticationTokenByCredentialCommandHandler>(),
-            //    ServiceLifetime.Scoped));
-            #endregion
-
-            #region Authentication - Validation
+            #region Authentication - Command
             cltService.AddScoped(typeof(IPipelineBehavior<AuthenticationTokenByCredentialCommand, IMessageResult<string>>), typeof(MessageValidationBehaviour<AuthenticationTokenByCredentialCommand, string>));
             cltService.TryAddTransient<IValidation<AuthenticationTokenByCredentialCommand>, AuthenticationTokenByCredentialValidation>();
 
@@ -57,133 +46,93 @@ namespace Passport.Application
             cltService.TryAddTransient<IValidation<AuthenticationTokenByRefreshTokenCommand>, AuthenticationTokenByRefreshTokenValidation>();
             #endregion
 
-            #region Passport - Authorization
-            cltService.AddScoped(typeof(IPipelineBehavior<RegisterPassportCommand, IMessageResult<Guid>>), typeof(MessageAuthorizationBehaviour<RegisterPassportCommand, Guid>));
-            cltService.TryAddTransient<IAuthorization<RegisterPassportCommand>, RegisterPassportAuthorization>();
+            #region Passport - Command
+            cltService.AddAuthorizationBehaviour<RegisterPassportCommand, Guid, RegisterPassportAuthorization>();
+            cltService.AddValidationBehaviour<RegisterPassportCommand, Guid, RegisterPassportValidation>();
 
-            cltService.AddScoped(typeof(IPipelineBehavior<SeizePassportCommand, IMessageResult<bool>>), typeof(MessageAuthorizationBehaviour<SeizePassportCommand, bool>));
-            cltService.TryAddTransient<IAuthorization<SeizePassportCommand>, SeizePassportAuthorization>();
+            cltService.AddAuthorizationBehaviour<SeizePassportCommand, bool, SeizePassportAuthorization>();
+            cltService.AddValidationBehaviour<SeizePassportCommand, bool, SeizePassportValidation>();
 
-            cltService.AddScoped(typeof(IPipelineBehavior<UpdatePassportCommand, IMessageResult<bool>>), typeof(MessageAuthorizationBehaviour<UpdatePassportCommand, bool>));
-            cltService.TryAddTransient<IAuthorization<UpdatePassportCommand>, UpdatePassportAuthorization>();
+            cltService.AddAuthorizationBehaviour<UpdatePassportCommand, bool, UpdatePassportAuthorization>();
+            cltService.AddValidationBehaviour<UpdatePassportCommand, bool, UpdatePassportValidation>();
             #endregion
 
-            #region Passport - Validation
-            cltService.AddScoped(typeof(IPipelineBehavior<RegisterPassportCommand, IMessageResult<Guid>>), typeof(MessageValidationBehaviour<RegisterPassportCommand, Guid>));
-            cltService.TryAddTransient<IValidation<RegisterPassportCommand>, RegisterPassportValidation>();
+            #region PassportHolder - Command
+            cltService.AddAuthorizationBehaviour<ConfirmEmailAddressCommand, bool, ConfirmEmailAddressAuthorization>();
+            cltService.AddValidationBehaviour<ConfirmEmailAddressCommand, bool, ConfirmEmailAddressValidation>();
 
-            cltService.AddScoped(typeof(IPipelineBehavior<SeizePassportCommand, IMessageResult<bool>>), typeof(MessageValidationBehaviour<SeizePassportCommand, bool>));
-            cltService.TryAddTransient<IValidation<SeizePassportCommand>, SeizePassportValidation>();
+            cltService.AddAuthorizationBehaviour<ConfirmPhoneNumberCommand, bool, ConfirmPhoneNumberAuthorization>();
+            cltService.AddValidationBehaviour<ConfirmPhoneNumberCommand, bool, ConfirmPhoneNumberValidation>();
 
-            cltService.AddScoped(typeof(IPipelineBehavior<UpdatePassportCommand, IMessageResult<bool>>), typeof(MessageValidationBehaviour<UpdatePassportCommand, bool>));
-            cltService.TryAddTransient<IValidation<UpdatePassportCommand>, UpdatePassportValidation>();
+            cltService.AddAuthorizationBehaviour<DeletePassportHolderCommand, bool, DeletePassportHolderAuthorization>();
+            cltService.AddValidationBehaviour<DeletePassportHolderCommand, bool, DeletePassportHolderValidation>();
+
+            cltService.AddAuthorizationBehaviour<UpdatePassportHolderCommand, bool, UpdatePassportHolderAuthorization>();
+            cltService.AddValidationBehaviour<UpdatePassportHolderCommand, bool, UpdatePassportHolderValidation>();
             #endregion
 
-            #region PassportHolder - Authorization
-            cltService.AddScoped(typeof(IPipelineBehavior<ConfirmEmailAddressCommand, IMessageResult<bool>>), typeof(MessageAuthorizationBehaviour<ConfirmEmailAddressCommand, bool>));
-            cltService.TryAddTransient<IAuthorization<ConfirmEmailAddressCommand>, ConfirmEmailAddressAuthorization>();
+            #region PassportToken - Command
+            cltService.AddAuthorizationBehaviour<CreatePassportTokenCommand, bool, CreatePassportTokenAuthorization>();
+            cltService.AddValidationBehaviour<CreatePassportTokenCommand, bool, CreatePassportTokenValidation>();
 
-            cltService.AddScoped(typeof(IPipelineBehavior<ConfirmPhoneNumberCommand, IMessageResult<bool>>), typeof(MessageAuthorizationBehaviour<ConfirmPhoneNumberCommand, bool>));
-            cltService.TryAddTransient<IAuthorization<ConfirmPhoneNumberCommand>, ConfirmPhoneNumberAuthorization>();
+            cltService.AddAuthorizationBehaviour<DeletePassportTokenCommand, bool, DeletePassportTokenAuthorization>();
+            cltService.AddValidationBehaviour<DeletePassportTokenCommand, bool, DeletePassportTokenValidation>();
 
-            cltService.AddScoped(typeof(IPipelineBehavior<DeletePassportHolderCommand, IMessageResult<bool>>), typeof(MessageAuthorizationBehaviour<DeletePassportHolderCommand, bool>));
-            cltService.TryAddTransient<IAuthorization<DeletePassportHolderCommand>, DeletePassportHolderAuthorization>();
+            cltService.AddAuthorizationBehaviour<EnableTwoFactorAuthenticationCommand, bool, EnableTwoFactorAuthenticationAuthorization>();
+            cltService.AddValidationBehaviour<EnableTwoFactorAuthenticationCommand, bool, EnableTwoFactorAuthenticationValidation>();
 
-            cltService.AddScoped(typeof(IPipelineBehavior<UpdatePassportHolderCommand, IMessageResult<bool>>), typeof(MessageAuthorizationBehaviour<UpdatePassportHolderCommand, bool>));
-            cltService.TryAddTransient<IAuthorization<UpdatePassportHolderCommand>, UpdatePassportHolderAuthorization>();
+            cltService.AddAuthorizationBehaviour<ResetCredentialCommand, bool, ResetCredentialAuthorization>();
+            cltService.AddValidationBehaviour<ResetCredentialCommand, bool, ResetCredentialValidation>();
             #endregion
 
-            #region PassportHolder - Validation
-            cltService.AddScoped(typeof(IPipelineBehavior<ConfirmEmailAddressCommand, IMessageResult<bool>>), typeof(MessageValidationBehaviour<ConfirmEmailAddressCommand, bool>));
-            cltService.TryAddTransient<IValidation<ConfirmEmailAddressCommand>, ConfirmEmailAddressValidation>();
+            #region PassportVisa - Command
+            cltService.AddAuthorizationBehaviour<CreatePassportVisaCommand, Guid, CreatePassportVisaAuthorization>();
+            cltService.AddValidationBehaviour<CreatePassportVisaCommand, Guid, CreatePassportVisaValidation>();
 
-            cltService.AddScoped(typeof(IPipelineBehavior<ConfirmPhoneNumberCommand, IMessageResult<bool>>), typeof(MessageValidationBehaviour<ConfirmPhoneNumberCommand, bool>));
-            cltService.TryAddTransient<IValidation<ConfirmPhoneNumberCommand>, ConfirmPhoneNumberValidation>();
+            cltService.AddAuthorizationBehaviour<DeletePassportVisaCommand, bool, DeletePassportVisaAuthorization>();
+            cltService.AddValidationBehaviour<DeletePassportVisaCommand, bool, DeletePassportVisaValidation>();
 
-            cltService.AddScoped(typeof(IPipelineBehavior<DeletePassportHolderCommand, IMessageResult<bool>>), typeof(MessageValidationBehaviour<DeletePassportHolderCommand, bool>));
-            cltService.TryAddTransient<IValidation<DeletePassportHolderCommand>, DeletePassportHolderValidation>();
-
-            cltService.AddScoped(typeof(IPipelineBehavior<UpdatePassportHolderCommand, IMessageResult<bool>>), typeof(MessageValidationBehaviour<UpdatePassportHolderCommand, bool>));
-            cltService.TryAddTransient<IValidation<UpdatePassportHolderCommand>, UpdatePassportHolderValidation>();
+            cltService.AddAuthorizationBehaviour<UpdatePassportVisaCommand, bool, UpdatePassportVisaAuthorization>();
+            cltService.AddValidationBehaviour<UpdatePassportVisaCommand, bool, UpdatePassportVisaValidation>();
             #endregion
 
-            #region PassportToken - Authorization
-            cltService.AddScoped(typeof(IPipelineBehavior<CreatePassportTokenCommand, IMessageResult<bool>>), typeof(MessageAuthorizationBehaviour<CreatePassportTokenCommand, bool>));
-            cltService.TryAddTransient<IAuthorization<CreatePassportTokenCommand>, CreatePassportTokenAuthorization>();
-
-            cltService.AddScoped(typeof(IPipelineBehavior<DeletePassportTokenCommand, IMessageResult<bool>>), typeof(MessageAuthorizationBehaviour<DeletePassportTokenCommand, bool>));
-            cltService.TryAddTransient<IAuthorization<DeletePassportTokenCommand>, DeletePassportTokenAuthorization>();
-
-            cltService.AddScoped(typeof(IPipelineBehavior<EnableTwoFactorAuthenticationCommand, IMessageResult<bool>>), typeof(MessageAuthorizationBehaviour<EnableTwoFactorAuthenticationCommand, bool>));
-            cltService.TryAddTransient<IAuthorization<EnableTwoFactorAuthenticationCommand>, EnableTwoFactorAuthenticationAuthorization>();
-
-            cltService.AddScoped(typeof(IPipelineBehavior<ResetCredentialCommand, IMessageResult<bool>>), typeof(MessageAuthorizationBehaviour<ResetCredentialCommand, bool>));
-            cltService.TryAddTransient<IAuthorization<ResetCredentialCommand>, ResetCredentialAuthorization>();
+            #region Passport - Query
+            cltService.AddAuthorizationBehaviour<PassportByIdQuery, PassportByIdResult, PassportByIdAuthorization>();
+            cltService.AddValidationBehaviour<PassportByIdQuery, PassportByIdResult, PassportByIdValidation>();
             #endregion
 
-            #region PassportToken - Validation
-            cltService.AddScoped(typeof(IPipelineBehavior<CreatePassportTokenCommand, IMessageResult<bool>>), typeof(MessageValidationBehaviour<CreatePassportTokenCommand, bool>));
-            cltService.TryAddTransient<IValidation<CreatePassportTokenCommand>, CreatePassportTokenValidation>();
-
-            cltService.AddScoped(typeof(IPipelineBehavior<DeletePassportTokenCommand, IMessageResult<bool>>), typeof(MessageValidationBehaviour<DeletePassportTokenCommand, bool>));
-            cltService.TryAddTransient<IValidation<DeletePassportTokenCommand>, DeletePassportTokenValidation>();
-
-            cltService.AddScoped(typeof(IPipelineBehavior<EnableTwoFactorAuthenticationCommand, IMessageResult<bool>>), typeof(MessageValidationBehaviour<EnableTwoFactorAuthenticationCommand, bool>));
-            cltService.TryAddTransient<IValidation<EnableTwoFactorAuthenticationCommand>, EnableTwoFactorAuthenticationValidation>();
-
-            cltService.AddScoped(typeof(IPipelineBehavior<ResetCredentialCommand, IMessageResult<bool>>), typeof(MessageValidationBehaviour<ResetCredentialCommand, bool>));
-            cltService.TryAddTransient<IValidation<ResetCredentialCommand>, ResetCredentialValidation>();
+            #region PassportHolder - Query
+            cltService.AddAuthorizationBehaviour<PassportHolderByIdQuery, PassportHolderByIdResult, PassportHolderByIdAuthorization>();
+            cltService.AddValidationBehaviour<PassportHolderByIdQuery, PassportHolderByIdResult, PassportHolderByIdValidation>();
             #endregion
 
-            #region PassportVisa - Authorization
-            cltService.AddScoped(typeof(IPipelineBehavior<CreatePassportVisaCommand, IMessageResult<Guid>>), typeof(MessageAuthorizationBehaviour<CreatePassportVisaCommand, Guid>));
-            cltService.TryAddTransient<IAuthorization<CreatePassportVisaCommand>, CreatePassportVisaAuthorization>();
+            #region PassportVisa - Query
+            cltService.AddAuthorizationBehaviour<PassportVisaByIdQuery, PassportVisaByIdResult, PassportVisaByIdAuthorization>();
+            cltService.AddValidationBehaviour<PassportVisaByIdQuery, PassportVisaByIdResult, PassportVisaByIdValidation>();
 
-            cltService.AddScoped(typeof(IPipelineBehavior<DeletePassportVisaCommand, IMessageResult<bool>>), typeof(MessageAuthorizationBehaviour<DeletePassportVisaCommand, bool>));
-            cltService.TryAddTransient<IAuthorization<DeletePassportVisaCommand>, DeletePassportVisaAuthorization>();
-
-            cltService.AddScoped(typeof(IPipelineBehavior<UpdatePassportVisaCommand, IMessageResult<bool>>), typeof(MessageAuthorizationBehaviour<UpdatePassportVisaCommand, bool>));
-            cltService.TryAddTransient<IAuthorization<UpdatePassportVisaCommand>, UpdatePassportVisaAuthorization>();
+            cltService.AddAuthorizationBehaviour<PassportVisaByPassportIdQuery, PassportVisaByPassportIdResult, PassportVisaByPassportIdAuthorization>();
+            cltService.AddValidationBehaviour<PassportVisaByPassportIdQuery, PassportVisaByPassportIdResult, PassportVisaByPassportIdValidation>();
             #endregion
 
-            #region PassportVisa - Validation
-            cltService.AddScoped(typeof(IPipelineBehavior<CreatePassportVisaCommand, IMessageResult<Guid>>), typeof(MessageValidationBehaviour<CreatePassportVisaCommand, Guid>));
-            cltService.TryAddTransient<IValidation<CreatePassportVisaCommand>, CreatePassportVisaValidation>();
+            return cltService;
+        }
 
-            cltService.AddScoped(typeof(IPipelineBehavior<DeletePassportVisaCommand, IMessageResult<bool>>), typeof(MessageValidationBehaviour<DeletePassportVisaCommand, bool>));
-            cltService.TryAddTransient<IValidation<DeletePassportVisaCommand>, DeletePassportVisaValidation>();
+        public static IServiceCollection AddAuthorizationBehaviour<TMessage, TResponse, TAuthorization>(this IServiceCollection cltService)
+            where TMessage : notnull, IMessage, IRestrictedAuthorization
+            where TAuthorization : IAuthorization<TMessage>
+        {
+            cltService.AddScoped(typeof(IPipelineBehavior<TMessage, IMessageResult<TResponse>>), typeof(MessageAuthorizationBehaviour<TMessage, TResponse>));
+            cltService.TryAddTransient(typeof(IAuthorization<TMessage>), typeof(TAuthorization));
 
-            cltService.AddScoped(typeof(IPipelineBehavior<UpdatePassportVisaCommand, IMessageResult<bool>>), typeof(MessageValidationBehaviour<UpdatePassportVisaCommand, bool>));
-            cltService.TryAddTransient<IValidation<UpdatePassportVisaCommand>, UpdatePassportVisaValidation>();
-            #endregion
+            return cltService;
+        }
 
-            #region Passport - Authorization
-            cltService.AddScoped(typeof(IPipelineBehavior<PassportByIdQuery, IMessageResult<PassportByIdResult>>), typeof(MessageAuthorizationBehaviour<PassportByIdQuery, PassportByIdResult>));
-            cltService.TryAddTransient<IAuthorization<PassportByIdQuery>, PassportByIdAuthorization>();
-
-            cltService.AddScoped(typeof(IPipelineBehavior<PassportHolderByIdQuery, IMessageResult<PassportHolderByIdResult>>), typeof(MessageAuthorizationBehaviour<PassportHolderByIdQuery, PassportHolderByIdResult>));
-            cltService.TryAddTransient<IAuthorization<PassportHolderByIdQuery>, PassportHolderByIdAuthorization>();
-
-            cltService.AddScoped(typeof(IPipelineBehavior<PassportVisaByIdQuery, IMessageResult<PassportVisaByIdResult>>), typeof(MessageAuthorizationBehaviour<PassportVisaByIdQuery, PassportVisaByIdResult>));
-            cltService.TryAddTransient<IAuthorization<PassportVisaByIdQuery>, PassportVisaByIdAuthorization>();
-
-            cltService.AddScoped(typeof(IPipelineBehavior<PassportVisaByPassportIdQuery, IMessageResult<PassportVisaByPassportIdResult>>), typeof(MessageAuthorizationBehaviour<PassportVisaByPassportIdQuery, PassportVisaByPassportIdResult>));
-            cltService.TryAddTransient<IAuthorization<PassportVisaByPassportIdQuery>, PassportVisaByPassportIdAuthorization>();
-            #endregion
-
-            #region Passport - Validation
-            cltService.AddScoped(typeof(IPipelineBehavior<PassportByIdQuery, IMessageResult<PassportByIdResult>>), typeof(MessageValidationBehaviour<PassportByIdQuery, PassportByIdResult>));
-            cltService.TryAddTransient<IValidation<PassportByIdQuery>, PassportByIdValidation>();
-
-            cltService.AddScoped(typeof(IPipelineBehavior<PassportHolderByIdQuery, IMessageResult<PassportHolderByIdResult>>), typeof(MessageValidationBehaviour<PassportHolderByIdQuery, PassportHolderByIdResult>));
-            cltService.TryAddTransient<IValidation<PassportHolderByIdQuery>, PassportHolderByIdValidation>();
-
-            cltService.AddScoped(typeof(IPipelineBehavior<PassportVisaByIdQuery, IMessageResult<PassportVisaByIdResult>>), typeof(MessageValidationBehaviour<PassportVisaByIdQuery, PassportVisaByIdResult>));
-            cltService.TryAddTransient<IValidation<PassportVisaByIdQuery>, PassportVisaByIdValidation>();
-
-            cltService.AddScoped(typeof(IPipelineBehavior<PassportVisaByPassportIdQuery, IMessageResult<PassportVisaByPassportIdResult>>), typeof(MessageValidationBehaviour<PassportVisaByPassportIdQuery, PassportVisaByPassportIdResult>));
-            cltService.TryAddTransient<IValidation<PassportVisaByPassportIdQuery>, PassportVisaByPassportIdValidation>();
-            #endregion
+        public static IServiceCollection AddValidationBehaviour<TMessage, TResponse, TValidation>(this IServiceCollection cltService)
+            where TMessage : notnull, IMessage
+            where TValidation : IValidation<TMessage>
+        {
+            cltService.AddScoped(typeof(IPipelineBehavior<TMessage, IMessageResult<TResponse>>), typeof(MessageValidationBehaviour<TMessage, TResponse>));
+            cltService.TryAddTransient(typeof(IValidation<TMessage>), typeof(TValidation));
 
             return cltService;
         }

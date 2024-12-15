@@ -17,26 +17,26 @@ namespace Passport.Api
             this.cltService = cltService;
         }
 
-        public PassportServiceCollectionBuilder AddSqliteDatabase(string sConnectionStringName)
+        public PassportServiceCollectionBuilder Configure(Action<PassportSetting> actnPassportSetting)
         {
-            cltService.AddSqliteDatabase(sConnectionStringName);
+            cltService.Replace(new ServiceDescriptor(
+                typeof(IPassportSetting),
+                prvService =>
+                {
+                    PassportSetting ppSetting = new PassportSetting();
+
+                    actnPassportSetting(ppSetting);
+
+                    return ppSetting;
+                },
+                ServiceLifetime.Scoped));
 
             return new PassportServiceCollectionBuilder(cltService);
         }
 
-        public PassportServiceCollectionBuilder Configure(Action<PassportSetting> actnPassportSetting)
+        public PassportServiceCollectionBuilder AddSqliteDatabase(string sConnectionStringName)
         {
-            cltService.TryAddScoped<IPassportSetting>(prvService =>
-            {
-                IPassportSetting ppSetting = prvService.GetRequiredService<IPassportSetting>();
-
-                if (ppSetting is PassportSetting == false)
-                    throw new InvalidCastException("IPassportSetting could not be configured.");
-
-                actnPassportSetting((PassportSetting)ppSetting);
-
-                return ppSetting;
-            });
+            cltService.AddSqliteDatabase(sConnectionStringName);
 
             return new PassportServiceCollectionBuilder(cltService);
         }

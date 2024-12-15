@@ -13,7 +13,7 @@ namespace Passport.Application.Authorization
     /// Important: <see cref="TResponse"/> is implemented as <see cref="IMessageResult{TResponse}"/>
     /// </summary>
     /// <typeparam name="TMessage"></typeparam>
-    /// <typeparam name="TResponse">Do not use IMessageResult</typeparam>
+    /// <typeparam name="TResponse">Do not use IMessageResult!</typeparam>
     internal sealed class MessageAuthorizationBehaviour<TMessage, TResponse> : IPipelineBehavior<TMessage, IMessageResult<TResponse>>
         where TMessage : notnull, IMessage, IRestrictedAuthorization
     {
