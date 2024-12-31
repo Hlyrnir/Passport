@@ -22,7 +22,7 @@ namespace Passport.Application.Test
 
         private readonly IAuthenticationTokenHandler<Guid> authHandler;
 
-        private readonly FakeDatabase dbFaker;
+        private readonly FakeDatabase dbFake;
 
         public PassportFixture()
         {
@@ -39,12 +39,12 @@ namespace Passport.Application.Test
 
             uowUnitOfWork = new FakeUnitOfWork();
 
-            dbFaker = new FakeDatabase();
+            dbFake = new FakeDatabase();
 
-            repoPassport = new FakePassportRepository(dbFaker);
-            repoHolder = new FakePassportHolderRepository(dbFaker, ppSetting);
-            repoToken = new FakePassportTokenRepository(dbFaker, ppSetting);
-            repoVisa = new FakePassportVisaRepository(dbFaker);
+            repoPassport = new FakePassportRepository(dbFake);
+            repoHolder = new FakePassportHolderRepository(dbFake, ppSetting);
+            repoToken = new FakePassportTokenRepository(dbFake, ppSetting);
+            repoVisa = new FakePassportVisaRepository(dbFake);
 
             authHandler = new FakeAuthenticationTokenHandler();
         }

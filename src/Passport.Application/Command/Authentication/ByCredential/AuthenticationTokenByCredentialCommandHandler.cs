@@ -76,7 +76,7 @@ namespace Passport.Application.Command.Authentication.ByCredential
 
                                     return new AuthenticationTokenTransferObject()
                                     {
-                                        ExpiredAt = ppPassport.ExpiredAt,
+                                        ExpiredAt = ppToken.ExpiredAt,
                                         Provider = ppToken.Provider,
                                         RefreshToken = ppToken.RefreshToken,
                                         Token = authTokenHandler.Generate(ppPassport.Id, prvTime)

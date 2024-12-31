@@ -23,7 +23,9 @@
   </ItemGroup>
 
   <ItemGroup>
+	<InternalsVisibleTo Include="Passport.Api.Test"/>
     <InternalsVisibleTo Include="Passport.Application.Test" />
+	<InternalsVisibleTo Include="Passport.Infrastructure.Test"/>
   </ItemGroup>
 
 </Project>

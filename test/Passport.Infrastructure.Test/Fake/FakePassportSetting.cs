@@ -1,6 +1,6 @@
 ﻿using Passport.Application.Interface;
 
-namespace Passport.Application.Test.Fake
+namespace Passport.Infrastructure.Test.Fake
 {
     internal class FakePassportSetting : IPassportSetting
     {

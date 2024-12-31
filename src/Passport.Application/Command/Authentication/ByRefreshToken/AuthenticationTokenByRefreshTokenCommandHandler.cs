@@ -38,41 +38,51 @@ namespace Passport.Application.Command.Authentication.ByRefreshToken
             if (tknCancellation.IsCancellationRequested)
                 return new MessageResult<AuthenticationTokenTransferObject>(DefaultMessageError.TaskAborted);
 
-            RepositoryResult<PassportTokenTransferObject> pprToken = await repoToken.FindTokenByRefreshTokenAsync(cmdToken.PassportId, cmdToken.Provider, cmdToken.RefreshToken, prvTime.GetUtcNow(), tknCancellation);
+            RepositoryResult<int> rsltRemainingAttempt = await repoToken.VerifyRefreshTokenAsync(cmdToken.PassportId, cmdToken.Provider, cmdToken.RefreshToken, prvTime.GetUtcNow(), tknCancellation);
 
-            return await pprToken.MatchAsync(
-                msgError => new MessageResult<AuthenticationTokenTransferObject>(new MessageError() { Code = msgError.Code, Description = msgError.Description }),
-                async dtoPassportToken =>
+            return await rsltRemainingAttempt.MatchAsync(
+                msgError => new MessageResult<AuthenticationTokenTransferObject>(AuthenticationError.CredentialNotFound),
+                async iRemainingAttempt =>
                 {
-                    Domain.Aggregate.PassportToken? ppToken = dtoPassportToken.Initialize();
+                    if (iRemainingAttempt <= 0)
+                        return new MessageResult<AuthenticationTokenTransferObject>(AuthenticationError.TooManyAttempts);
 
-                    if (ppToken is null)
-                        return new MessageResult<AuthenticationTokenTransferObject>(DomainError.InitializationHasFailed);
+                    RepositoryResult<PassportTokenTransferObject> pprToken = await repoToken.FindTokenByRefreshTokenAsync(cmdToken.PassportId, cmdToken.Provider, cmdToken.RefreshToken, prvTime.GetUtcNow(), tknCancellation);
 
-                    RepositoryResult<PassportTransferObject> rsltPassport = await repoPassport.FindByIdAsync(ppToken.PassportId, tknCancellation);
-
-                    return rsltPassport.Match(
+                    return await pprToken.MatchAsync(
                         msgError => new MessageResult<AuthenticationTokenTransferObject>(new MessageError() { Code = msgError.Code, Description = msgError.Description }),
-                        dtoPassport =>
+                        async dtoPassportToken =>
                         {
-                            Domain.Aggregate.Passport? ppPassport = dtoPassport.Initialize();
+                            Domain.Aggregate.PassportToken? ppToken = dtoPassportToken.Initialize();
 
-                            if (ppPassport is null)
+                            if (ppToken is null)
                                 return new MessageResult<AuthenticationTokenTransferObject>(DomainError.InitializationHasFailed);
 
-                            if (ppPassport.IsExpired(prvTime.GetUtcNow()) == true)
-                                return new MessageResult<AuthenticationTokenTransferObject>(AuthorizationError.Passport.IsExpired);
+                            RepositoryResult<PassportTransferObject> rsltPassport = await repoPassport.FindByIdAsync(ppToken.PassportId, tknCancellation);
 
-                            if (ppPassport.IsEnabled == false)
-                                return new MessageResult<AuthenticationTokenTransferObject>(AuthorizationError.Passport.IsDisabled);
+                            return rsltPassport.Match(
+                                msgError => new MessageResult<AuthenticationTokenTransferObject>(new MessageError() { Code = msgError.Code, Description = msgError.Description }),
+                                dtoPassport =>
+                                {
+                                    Domain.Aggregate.Passport? ppPassport = dtoPassport.Initialize();
 
-                            return new AuthenticationTokenTransferObject()
-                            {
-                                ExpiredAt = ppPassport.ExpiredAt,
-                                Provider = ppToken.Provider,
-                                RefreshToken = ppToken.RefreshToken,
-                                Token = authTokenHandler.Generate(ppPassport.Id, prvTime)
-                            };
+                                    if (ppPassport is null)
+                                        return new MessageResult<AuthenticationTokenTransferObject>(DomainError.InitializationHasFailed);
+
+                                    if (ppPassport.IsExpired(prvTime.GetUtcNow()) == true)
+                                        return new MessageResult<AuthenticationTokenTransferObject>(AuthorizationError.Passport.IsExpired);
+
+                                    if (ppPassport.IsEnabled == false)
+                                        return new MessageResult<AuthenticationTokenTransferObject>(AuthorizationError.Passport.IsDisabled);
+
+                                    return new AuthenticationTokenTransferObject()
+                                    {
+                                        ExpiredAt = ppToken.ExpiredAt,
+                                        Provider = ppToken.Provider,
+                                        RefreshToken = ppToken.RefreshToken,
+                                        Token = authTokenHandler.Generate(ppPassport.Id, prvTime)
+                                    };
+                                });
                         });
                 });
         }

@@ -61,7 +61,7 @@ namespace Passport.Application.Test.Command.AuthenticationTokenByRefreshToken
                 },
                 dtoAuthenticationToken =>
                 {
-                    dtoAuthenticationToken.ExpiredAt.Should().Be(ppPassport.ExpiredAt);
+                    dtoAuthenticationToken.ExpiredAt.Should().Be(prvTime.GetUtcNow().Add(fxtPassport.PassportSetting.RefreshTokenExpiresAfterDuration));
                     dtoAuthenticationToken.Provider.Should().Be(ppToken.Provider);
                     dtoAuthenticationToken.RefreshToken.Should().NotBe(ppToken.RefreshToken);
                     dtoAuthenticationToken.Token.Should().Be(authHandler.Generate(ppPassport.Id, prvTime));

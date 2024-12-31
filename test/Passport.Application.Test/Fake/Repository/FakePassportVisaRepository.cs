@@ -2,7 +2,7 @@
 using Passport.Application.Result;
 using Passport.Application.Transfer;
 
-#pragma warning disable CS1998 // Bei der asynchronen Methode fehlen "await"-Operatoren. Die Methode wird synchron ausgeführt.
+#pragma warning disable CS1998
 
 namespace Passport.Application.Test.Fake.Repository
 {
@@ -116,4 +116,4 @@ namespace Passport.Application.Test.Fake.Repository
     }
 }
 
-#pragma warning restore CS1998 // Bei der asynchronen Methode fehlen "await"-Operatoren. Die Methode wird synchron ausgeführt.
+#pragma warning restore CS1998

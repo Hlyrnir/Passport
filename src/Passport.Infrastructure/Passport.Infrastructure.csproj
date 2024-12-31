@@ -16,4 +16,8 @@
     <ProjectReference Include="..\Passport.Application\Passport.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="Passport.Infrastructure.Test" />
+  </ItemGroup>
+
 </Project>

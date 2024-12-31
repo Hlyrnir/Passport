@@ -4,7 +4,7 @@ using Passport.Application.Interface;
 using Passport.Application.Result;
 using Passport.Application.Transfer;
 
-#pragma warning disable CS1998 // Bei der asynchronen Methode fehlen "await"-Operatoren. Die Methode wird synchron ausgeführt.
+#pragma warning disable CS1998
 
 namespace Passport.Application.Test.Fake.Repository
 {
@@ -87,7 +87,7 @@ namespace Passport.Application.Test.Fake.Repository
                     if (dictFailedAttemptCounter.TryGetValue(kvpCredential.Key, out _) == false)
                         return new RepositoryResult<PassportTokenTransferObject>(TestError.Repository.PassportToken.FailedAttemptCounter.NotFound);
 
-                    PassportTokenTransferObject dtoPassportToken = dtoTokenInDictionary.Clone(bResetRefreshToken: true);
+                    PassportTokenTransferObject dtoPassportToken = dtoTokenInDictionary.Clone(dtAttemptedAt.Add(ppSetting.RefreshTokenExpiresAfterDuration));
 
                     dictFailedAttemptCounter[kvpCredential.Key] = 0;
                     dictToken[kvpCredential.Key] = dtoPassportToken;
@@ -112,13 +112,14 @@ namespace Passport.Application.Test.Fake.Repository
             if (dictToken.TryGetValue(guTokenId, out PassportTokenTransferObject? dtoTokenInDictionary) == false)
                 return new RepositoryResult<PassportTokenTransferObject>(TestError.Repository.PassportToken.NotFound);
 
-            if (dtoTokenInDictionary.Provider == sProvider
+            if (dtoTokenInDictionary.ExpiredAt > dtAttemptedAt
+                && dtoTokenInDictionary.Provider == sProvider
                 && dtoTokenInDictionary.RefreshToken == sRefreshToken)
             {
                 if (dictFailedAttemptCounter.TryGetValue(guTokenId, out _) == false)
                     return new RepositoryResult<PassportTokenTransferObject>(TestError.Repository.PassportToken.FailedAttemptCounter.NotFound);
 
-                PassportTokenTransferObject dtoPassportToken = dtoTokenInDictionary.Clone(true);
+                PassportTokenTransferObject dtoPassportToken = dtoTokenInDictionary.Clone(dtAttemptedAt.Add(ppSetting.RefreshTokenExpiresAfterDuration));
 
                 dictFailedAttemptCounter[guTokenId] = 0;
                 dictToken[guTokenId] = dtoPassportToken;
@@ -152,6 +153,26 @@ namespace Passport.Application.Test.Fake.Repository
                 return new RepositoryResult<bool>(TestError.Repository.PassportToken.NotFound);
 
             dictCredential[dtoToken.Id] = DataFaker.PassportCredential.Create(ppCredentialToApply.Credential, ppCredentialToApply.Signature);
+
+            return new RepositoryResult<bool>(true);
+        }
+
+        public async Task<RepositoryResult<bool>> ResetRefreshTokenAsync(Guid guPassportId, string sProvider, DateTimeOffset dtResetAt, CancellationToken tknCancellation)
+        {
+            Guid guTokenId = Guid.Empty;
+
+            foreach (KeyValuePair<Guid, PassportTokenTransferObject> kvpToken in dictToken)
+            {
+                if (kvpToken.Value.PassportId == guPassportId)
+                    guTokenId = kvpToken.Key;
+            }
+
+            if (dictToken.TryGetValue(guTokenId, out PassportTokenTransferObject? dtoTokenInDictionary) == false)
+                return new RepositoryResult<bool>(TestError.Repository.PassportToken.NotFound);
+
+            PassportTokenTransferObject dtoPassportToken = dtoTokenInDictionary.Clone(dtResetAt.Add(ppSetting.RefreshTokenExpiresAfterDuration));
+
+            dictToken[guTokenId] = dtoPassportToken;
 
             return new RepositoryResult<bool>(true);
         }
@@ -199,7 +220,8 @@ namespace Passport.Application.Test.Fake.Repository
                 return new RepositoryResult<int>(TestError.Repository.PassportToken.NotFound);
 
             if (dtoTokenInDictionary.Provider == sProvider
-                    && dtoTokenInDictionary.RefreshToken != sRefreshToken)
+                    && (dtoTokenInDictionary.ExpiredAt < dtVerifiedAt
+                    || dtoTokenInDictionary.RefreshToken != sRefreshToken))
             {
                 if (iActualCount < ppSetting.MaximalAllowedAccessAttempt)
                 {
@@ -213,4 +235,4 @@ namespace Passport.Application.Test.Fake.Repository
     }
 }
 
-#pragma warning restore CS1998 // Bei der asynchronen Methode fehlen "await"-Operatoren. Die Methode wird synchron ausgeführt.
+#pragma warning restore CS1998

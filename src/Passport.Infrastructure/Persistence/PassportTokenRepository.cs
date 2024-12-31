@@ -124,6 +124,10 @@ namespace Passport.Infrastructure.Persistence
 									[{PassportTokenColumn.EditedAt}] = @EditedAt, 
 									[{PassportTokenColumn.TwoFactorIsEnabled}] = @IsEnabled, 
 									[{PassportTokenColumn.RefreshToken}] = @RefreshToken 
+									WHERE [{PassportTokenColumn.Id}] = @Id; 
+                                    SELECT 
+                                    [{PassportTokenColumn.TwoFactorIsEnabled}] 
+									FROM [{PassportTokenTable.PassportToken}] 
 									WHERE [{PassportTokenColumn.Id}] = @Id;";
 
                 DynamicParameters dpParameter = new DynamicParameters();
@@ -132,21 +136,19 @@ namespace Passport.Infrastructure.Persistence
                 dpParameter.Add("Id", dtoPassportToken.Id);
                 dpParameter.Add("RefreshToken", Guid.NewGuid());
 
-                int iResult = -1;
-
-                iResult = await sqlDataAccess.Connection.ExecuteAsync(
+                bool bResult = await sqlDataAccess.Connection.ExecuteScalarAsync<bool>(
                     sql: sStatement,
                     param: dpParameter,
                     transaction: sqlDataAccess.Transaction);
 
-                if (iResult < 1)
+                if (bResult != bIsEnabled)
                     return new RepositoryResult<bool>(new RepositoryError()
                     {
                         Code = DefaultRepositoryError.Code.Method,
-                        Description = $"Two factor authentication is enabled: {bIsEnabled}."
+                        Description = $"Two factor authentication is enabled: {bResult}."
                     });
 
-                return new RepositoryResult<bool>(true);
+                return new RepositoryResult<bool>(bResult);
             }
             catch (Exception exException)
             {
@@ -170,6 +172,7 @@ namespace Passport.Infrastructure.Persistence
             try
             {
                 string sStatement = @$"UPDATE [{PassportTokenTable.PassportToken}] SET 
+                                    [{PassportTokenColumn.ExpiredAt}] = @ExpiredAt, 
 									[{PassportTokenColumn.FailedAttemptCounter}] = @FailedAttemptCounter, 
 									[{PassportTokenColumn.RefreshToken}] = @RefreshToken 
 									WHERE [{PassportTokenColumn.FailedAttemptCounter}] <= @MaximalAllowedAccessAttempt 
@@ -189,10 +192,11 @@ namespace Passport.Infrastructure.Persistence
 									AND [{PassportTokenColumn.Provider}] = @Provider 
 									AND [{PassportTokenColumn.Signature}] = @Signature;";
 
-                DateTimeOffset dtExpiredAt = dtAttemptedAt.Add(ppSetting.MaximalRefreshTokenEffectivity);
+                DateTimeOffset dtExpiredAt = dtAttemptedAt.Add(ppSetting.RefreshTokenExpiresAfterDuration);
 
                 DynamicParameters dpParameter = new DynamicParameters();
                 dpParameter.Add("Credential", ppCredential.Credential);
+                dpParameter.Add("ExpiredAt", dtExpiredAt);
                 dpParameter.Add("FailedAttemptCounter", 0); // Reset the failed attempt counter.
                 dpParameter.Add("MaximalAllowedAccessAttempt", ppSetting.MaximalAllowedAccessAttempt);
                 dpParameter.Add("Provider", ppCredential.Provider);
@@ -244,9 +248,11 @@ namespace Passport.Infrastructure.Persistence
             try
             {
                 string sStatement = @$"UPDATE [{PassportTokenTable.PassportToken}] SET 
+                                    [{PassportTokenColumn.ExpiredAt}] = @ExpiredAt, 
 									[{PassportTokenColumn.FailedAttemptCounter}] = @FailedAttemptCounter, 
 									[{PassportTokenColumn.RefreshToken}] = @RefreshToken 
-									WHERE [{PassportTokenColumn.FailedAttemptCounter}] <= @MaximalAllowedAccessAttempt 
+									WHERE [{PassportTokenColumn.ExpiredAt}] > @AttemptedAt 
+                                    AND [{PassportTokenColumn.FailedAttemptCounter}] <= @MaximalAllowedAccessAttempt 
 									AND [{PassportTokenColumn.PassportId}] = @PassportId 
 									AND [{PassportTokenColumn.Provider}] = @Provider 
 									AND [{PassportTokenColumn.RefreshToken}] = @ActualToken; 
@@ -258,15 +264,18 @@ namespace Passport.Infrastructure.Persistence
 									[{PassportTokenColumn.RefreshToken}], 
 									[{PassportTokenColumn.TwoFactorIsEnabled}] 
 									FROM [{PassportTokenTable.PassportToken}] 
-									WHERE [{PassportTokenColumn.FailedAttemptCounter}] <= @MaximalAllowedAccessAttempt 
+									WHERE [{PassportTokenColumn.ExpiredAt}] > @AttemptedAt 
+                                    AND [{PassportTokenColumn.FailedAttemptCounter}] <= @MaximalAllowedAccessAttempt 
 									AND [{PassportTokenColumn.PassportId}] = @PassportId 
 									AND [{PassportTokenColumn.Provider}] = @Provider 
 									AND [{PassportTokenColumn.RefreshToken}] = @RefreshToken;";
 
-                DateTimeOffset dtExpiredAt = dtAttemptedAt.Add(ppSetting.MaximalRefreshTokenEffectivity);
+                DateTimeOffset dtExpiredAt = dtAttemptedAt.Add(ppSetting.RefreshTokenExpiresAfterDuration);
 
                 DynamicParameters dpParameter = new DynamicParameters();
                 dpParameter.Add("ActualToken", sRefreshToken);
+                dpParameter.Add("AttemptedAt", dtAttemptedAt);
+                dpParameter.Add("ExpiredAt", dtExpiredAt);
                 dpParameter.Add("FailedAttemptCounter", 0); // Reset the failed attempt counter.
                 dpParameter.Add("MaximalAllowedAccessAttempt", ppSetting.MaximalAllowedAccessAttempt);
                 dpParameter.Add("PassportId", guPassportId);
@@ -446,6 +455,58 @@ namespace Passport.Infrastructure.Persistence
         }
 
         /// <inheritdoc/>
+        public async Task<RepositoryResult<bool>> ResetRefreshTokenAsync(
+            Guid guPassportId,
+            string sProvider,
+            DateTimeOffset dtResetAt,
+            CancellationToken tknCancellation)
+        {
+            if (tknCancellation.IsCancellationRequested)
+                return new RepositoryResult<bool>(DefaultRepositoryError.TaskAborted);
+
+            try
+            {
+                string sStatement = @$"UPDATE [{PassportTokenTable.PassportToken}] SET 
+									[{PassportTokenColumn.EditedAt}] = @EditedAt, 
+                                    [{PassportTokenColumn.ExpiredAt}] = @ExpiredAt, 
+									[{PassportTokenColumn.RefreshToken}] = @RefreshToken 
+									WHERE [{PassportTokenColumn.PassportId}] = @PassportId 
+									AND [{PassportTokenColumn.Provider}] = @Provider;";
+
+                DynamicParameters dpParameter = new DynamicParameters();
+                dpParameter.Add("EditedAt", dtResetAt);
+                dpParameter.Add("ExpiredAt", dtResetAt);
+                dpParameter.Add("RefreshToken", Guid.NewGuid());
+                dpParameter.Add("PassportId", guPassportId);
+                dpParameter.Add("Provider", sProvider);
+
+                int iResult = -1;
+
+                iResult = await sqlDataAccess.Connection.ExecuteAsync(
+                    sql: sStatement,
+                    param: dpParameter,
+                    transaction: sqlDataAccess.Transaction);
+
+                if (iResult < 1)
+                    return new RepositoryResult<bool>(new RepositoryError()
+                    {
+                        Code = DefaultRepositoryError.Code.Method,
+                        Description = $"Refresh token has not been reset at provider {sProvider}."
+                    });
+
+                return new RepositoryResult<bool>(true);
+            }
+            catch (Exception exException)
+            {
+                return new RepositoryResult<bool>(new RepositoryError()
+                {
+                    Code = DefaultRepositoryError.Code.Exception,
+                    Description = exException.Message
+                });
+            }
+        }
+
+        /// <inheritdoc/>
         public async Task<RepositoryResult<int>> VerifyCredentialAsync(
             IPassportCredential ppCredential,
             DateTimeOffset dtVerifiedAt,
@@ -509,7 +570,8 @@ namespace Passport.Infrastructure.Persistence
 									[{PassportTokenColumn.LastFailedAt}] = @LastFailedAt
 									WHERE [{PassportTokenColumn.PassportId}] = @PassportId 
 									AND [{PassportTokenColumn.Provider}] = @Provider 
-									AND [{PassportTokenColumn.RefreshToken}] <> @RefreshToken;
+									AND ([{PassportTokenColumn.ExpiredAt}] < @VerifiedAt 
+                                    OR [{PassportTokenColumn.RefreshToken}] != @RefreshToken);
 									SELECT 
 									[{PassportTokenColumn.FailedAttemptCounter}] 
 									FROM [{PassportTokenTable.PassportToken}] 
@@ -521,6 +583,7 @@ namespace Passport.Infrastructure.Persistence
                 dpParameter.Add("PassportId", guPassportId);
                 dpParameter.Add("Provider", sProvider);
                 dpParameter.Add("RefreshToken", sRefreshToken);
+                dpParameter.Add("VerifiedAt", dtVerifiedAt);
 
                 int iFailedAttemptCounter = await sqlDataAccess.Connection.ExecuteScalarAsync<int>(
                     sql: sStatement,

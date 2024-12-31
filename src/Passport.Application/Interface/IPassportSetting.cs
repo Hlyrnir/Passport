@@ -5,7 +5,6 @@
         int MaximalAllowedAccessAttempt { get; }
         int MaximalCredentialLength { get; }
         int MaximalSignatureLength { get; }
-        TimeSpan MaximalRefreshTokenEffectivity { get; }
         TimeSpan MinimalDelayBetweenAttempt { get; }
         TimeSpan MinimalLockoutDuration { get; }
         int MinimalPhoneNumberLength { get; }

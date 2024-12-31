@@ -74,6 +74,16 @@ namespace Passport.Application.Interface
         Task<RepositoryResult<bool>> ResetCredentialAsync(PassportTokenTransferObject dtoPassportToken, IPassportCredential ppCredentialToApply, DateTimeOffset dtResetAt, CancellationToken tknCancellation);
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="guPassportId"></param>
+        /// <param name="sProvider"></param>
+        /// <param name="dtResetAt"></param>
+        /// <param name="tknCancellation"></param>
+        /// <returns></returns>
+        Task<RepositoryResult<bool>> ResetRefreshTokenAsync(Guid guPassportId, string sProvider, DateTimeOffset dtResetAt, CancellationToken tknCancellation);
+
+        /// <summary>
         /// If <paramref name="ppCredential"/> does not match the database, the <see cref="int">number of failed attempts</see> is increased and a <see cref="RepositoryError"/> is returned.
         /// Otherwise the <see cref="int">number of remaining attempts</see> is returned.
         /// </summary>

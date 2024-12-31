@@ -8,6 +8,7 @@
         {
             public const string Token = $"{EndpointBase}/token";
             public const string RefreshToken = $"{EndpointBase}/refresh";
+            public const string Reset = $"{EndpointBase}/reset";
         }
 
         public static class Passport

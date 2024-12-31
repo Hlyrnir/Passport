@@ -9,10 +9,11 @@ namespace Passport.Api.Endpoint
 {
     public static class EndpointRouteBuilderExtension
     {
-        public static void AddAuthenticationEndpoint(this IEndpointRouteBuilder epBuilder)
+        public static void AddAuthenticationEndpoint(this IEndpointRouteBuilder epBuilder, params string[] sPolicyName)
         {
             epBuilder.AddGenerateAuthenticationTokenByCredentialEndpoint();
             epBuilder.AddGenerateAuthenticationTokenByRefreshTokenEndpoint();
+            epBuilder.AddResetRefreshTokenByPassportIdEndpoint(sPolicyName: sPolicyName);
         }
 
         public static void AddPassportEndpoint(this IEndpointRouteBuilder epBuilder, params string[] sPolicyName)
