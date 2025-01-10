@@ -25,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Passport.Abstraction", "src
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Passport.Application.Test", "test\Passport.Application.Test\Passport.Application.Test.csproj", "{81BED1D8-074C-41DB-9F31-7B71F5D0E03A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Passport.Infrastructure.Test", "test\Passport.Infrastructure.Test\Passport.Infrastructure.Test.csproj", "{23E36DA4-73D3-4B46-A759-16BD19028A83}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Passport.Infrastructure.Test", "test\Passport.Infrastructure.Test\Passport.Infrastructure.Test.csproj", "{23E36DA4-73D3-4B46-A759-16BD19028A83}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
