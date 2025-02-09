@@ -1,11 +1,12 @@
 ﻿using Passport.Abstraction.Authentication;
 using Passport.Application.Transfer;
 
-namespace Passport.Application.Test
+namespace Passport.Application.Test.Fake
 {
     internal sealed class FakeDatabase
     {
         public IDictionary<Guid, PassportTransferObject> Passport { get; } = new Dictionary<Guid, PassportTransferObject>();
+
         public IDictionary<Guid, PassportHolderTransferObject> Holder { get; } = new Dictionary<Guid, PassportHolderTransferObject>();
 
         public IDictionary<Guid, PassportTokenTransferObject> Token { get; } = new Dictionary<Guid, PassportTokenTransferObject>();
