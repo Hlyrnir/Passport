@@ -1,4 +1,7 @@
-﻿namespace Passport.Contract.v01.Response.Passport
+﻿using System;
+using System.Collections.Generic;
+
+namespace Passport.Contract.v01.Response.Passport
 {
     public sealed class PassportResponse
     {

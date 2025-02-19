@@ -1,4 +1,6 @@
 ﻿using Passport.Abstraction.Result;
+using System;
+using System.Threading.Tasks;
 
 namespace Passport.Application.Result
 {

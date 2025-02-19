@@ -1,4 +1,6 @@
-﻿namespace Passport.Contract.v01.Response.Authentication
+﻿using System;
+
+namespace Passport.Contract.v01.Response.Authentication
 {
     public class AuthenticationTokenResponse
     {

@@ -6,6 +6,11 @@ using Passport.Application.Result;
 using Passport.Application.Transfer;
 using Passport.Infrastructure.Name;
 using Passport.Infrastructure.TypeHandler;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Passport.Infrastructure.Persistence
 {

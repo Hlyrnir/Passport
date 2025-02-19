@@ -2,6 +2,8 @@
 using Passport.Abstraction.Result;
 using Passport.Application.Default;
 using Passport.Application.Result;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Passport.Application.Query.Passport.ById
 {

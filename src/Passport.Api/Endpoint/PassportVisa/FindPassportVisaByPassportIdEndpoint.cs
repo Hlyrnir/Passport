@@ -7,6 +7,10 @@ using Passport.Application.Query.PassportVisa.ByPassportId;
 using Passport.Application.Result;
 using Passport.Application.Transfer;
 using Passport.Contract.v01.Response.PassportVisa;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Passport.Api.Endpoint.PassportVisa
 {

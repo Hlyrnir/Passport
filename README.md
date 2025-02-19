@@ -1,6 +1,6 @@
 #### Description
 
-This repository can be used to add authorization to Minimal API endpoints.
+Passport can be used for authorization in a Mediator project. For each message, a required visa can be defined, and only if the holder is authorized, the message will be processed.
 
 - PassportVisa: For every endpoint you can specify a mandatory visa. This visa has to be issued to a passport in order to authorize any request.
 - Passport: A passport has to be enabled and valid to generate a authentication token.

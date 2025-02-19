@@ -1,4 +1,6 @@
-﻿namespace Passport.Contract.v01.Request.Authentication
+﻿using System;
+
+namespace Passport.Contract.v01.Request.Authentication
 {
     public sealed class GenerateAuthenticationTokenByRefreshTokenRequest
     {

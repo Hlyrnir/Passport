@@ -1,6 +1,7 @@
 ﻿using Mediator;
 using Passport.Abstraction.Authorization;
 using Passport.Application.Result;
+using System;
 
 namespace Passport.Application.Query.PassportVisa.ByPassportId
 {

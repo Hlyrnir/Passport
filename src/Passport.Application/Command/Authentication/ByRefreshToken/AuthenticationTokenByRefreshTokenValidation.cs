@@ -3,6 +3,8 @@ using Passport.Abstraction.Validation;
 using Passport.Application.Default;
 using Passport.Application.Result;
 using Passport.Application.Validation;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Passport.Application.Command.Authentication.ByRefreshToken
 {

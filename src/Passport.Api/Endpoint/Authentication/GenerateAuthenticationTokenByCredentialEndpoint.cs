@@ -8,6 +8,8 @@ using Passport.Application.Command.Authentication.ByCredential;
 using Passport.Application.Transfer;
 using Passport.Contract.v01.Request.Authentication;
 using Passport.Contract.v01.Response.Authentication;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Passport.Api.Endpoint.Authentication
 {

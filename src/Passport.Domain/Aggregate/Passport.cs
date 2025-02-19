@@ -1,4 +1,8 @@
-﻿namespace Passport.Domain.Aggregate
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Passport.Domain.Aggregate
 {
     public sealed class Passport
     {

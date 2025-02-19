@@ -5,6 +5,9 @@ using Passport.Application.Extension;
 using Passport.Application.Interface;
 using Passport.Application.Result;
 using Passport.Application.Transfer;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Passport.Application.Command.PassportHolder.ConfirmEmailAddress
 {

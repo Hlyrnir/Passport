@@ -2,6 +2,7 @@
 using Passport.Abstraction.Authentication;
 using Passport.Abstraction.Authorization;
 using Passport.Application.Result;
+using System;
 
 namespace Passport.Application.Command.PassportVisa.Delete
 {

@@ -1,4 +1,5 @@
 ﻿using Passport.Domain.ValueObject;
+using System;
 
 namespace Passport.Domain.Aggregate
 {

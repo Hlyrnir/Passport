@@ -1,6 +1,7 @@
 ﻿using Mediator;
 using Passport.Abstraction.Result;
 using Passport.Application.Transfer;
+using System;
 
 namespace Passport.Application.Command.Authentication.ByRefreshToken
 {

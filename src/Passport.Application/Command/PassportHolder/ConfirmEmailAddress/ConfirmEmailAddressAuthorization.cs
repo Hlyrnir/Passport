@@ -2,6 +2,8 @@
 using Passport.Abstraction.Result;
 using Passport.Application.Default;
 using Passport.Application.Result;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Passport.Application.Command.PassportHolder.ConfirmEmailAddress
 {
@@ -15,7 +17,7 @@ namespace Passport.Application.Command.PassportHolder.ConfirmEmailAddress
             if (tknCancellation.IsCancellationRequested)
                 return new MessageResult<bool>(DefaultMessageError.TaskAborted);
 
-            return await Task.FromResult(new MessageResult<bool>(true));
+            return new MessageResult<bool>(true);
         }
     }
 }

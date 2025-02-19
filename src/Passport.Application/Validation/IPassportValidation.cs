@@ -1,4 +1,5 @@
 ﻿using Passport.Application.Result;
+using System;
 
 namespace Passport.Application.Validation
 {

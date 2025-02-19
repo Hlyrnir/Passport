@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using System;
 using System.Data;
 
 namespace Passport.Infrastructure.TypeHandler

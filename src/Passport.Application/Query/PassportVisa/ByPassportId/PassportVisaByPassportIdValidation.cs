@@ -4,10 +4,13 @@ using Passport.Application.Default;
 using Passport.Application.Interface;
 using Passport.Application.Result;
 using Passport.Application.Validation;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Passport.Application.Query.PassportVisa.ByPassportId
 {
-    internal class PassportVisaByPassportIdValidation : IValidation<PassportVisaByPassportIdQuery>
+    internal sealed class PassportVisaByPassportIdValidation : IValidation<PassportVisaByPassportIdQuery>
     {
         private readonly TimeProvider prvTime;
         private readonly IPassportValidation srvValidation;

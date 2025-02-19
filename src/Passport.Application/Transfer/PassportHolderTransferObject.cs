@@ -1,4 +1,6 @@
-﻿namespace Passport.Application.Transfer
+﻿using System;
+
+namespace Passport.Application.Transfer
 {
     public sealed class PassportHolderTransferObject
     {

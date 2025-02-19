@@ -1,6 +1,6 @@
 ﻿namespace Passport.Domain.ValueObject
 {
-    public class PassportHolderSetting
+    public sealed class PassportHolderSetting
     {
         public int MinimalPhoneNumberLength { get; init; }
     }

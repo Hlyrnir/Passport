@@ -1,4 +1,6 @@
-﻿namespace Passport.Contract.v01.Response.PassportHolder
+﻿using System;
+
+namespace Passport.Contract.v01.Response.PassportHolder
 {
     public sealed class PassportHolderResponse
     {

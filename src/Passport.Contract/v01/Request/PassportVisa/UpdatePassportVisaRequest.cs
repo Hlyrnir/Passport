@@ -1,4 +1,6 @@
-﻿namespace Passport.Contract.v01.Request.PassportVisa
+﻿using System;
+
+namespace Passport.Contract.v01.Request.PassportVisa
 {
     public class UpdatePassportVisaRequest : VerifiedRequest
     {

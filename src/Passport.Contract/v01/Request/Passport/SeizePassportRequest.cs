@@ -1,4 +1,6 @@
-﻿namespace Passport.Contract.v01.Request.Passport
+﻿using System;
+
+namespace Passport.Contract.v01.Request.Passport
 {
     public sealed class SeizePassportRequest : VerifiedRequest
     {

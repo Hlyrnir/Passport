@@ -1,5 +1,8 @@
 ﻿using Passport.Application.Result;
 using Passport.Application.Transfer;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Passport.Application.Interface
 {

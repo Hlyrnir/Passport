@@ -1,7 +1,9 @@
-﻿namespace Passport.Abstraction.Authentication
+﻿using System;
+
+namespace Passport.Abstraction.Authentication
 {
     public interface IAuthenticationTokenHandler<T>
     {
-        public string Generate(T gId, TimeProvider prvTime);
+        string Generate(T gId, TimeProvider prvTime);
     }
 }

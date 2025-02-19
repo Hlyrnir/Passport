@@ -1,4 +1,7 @@
-﻿namespace Passport.Abstraction.Result
+﻿using System;
+using System.Threading.Tasks;
+
+namespace Passport.Abstraction.Result
 {
     public interface IMessageResult<T>
     {

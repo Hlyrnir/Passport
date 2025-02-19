@@ -1,4 +1,7 @@
-﻿namespace Passport.Application.Transfer
+﻿using System;
+using System.Collections.Generic;
+
+namespace Passport.Application.Transfer
 {
     public sealed class PassportTransferObject
     {

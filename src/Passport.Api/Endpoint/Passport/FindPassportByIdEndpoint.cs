@@ -6,6 +6,9 @@ using Passport.Application.Default;
 using Passport.Application.Query.Passport.ById;
 using Passport.Application.Result;
 using Passport.Contract.v01.Response.Passport;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Passport.Api.Endpoint.Passport
 {

@@ -1,4 +1,6 @@
-﻿namespace Passport.Contract.v01.Request.PassportHolder
+﻿using System;
+
+namespace Passport.Contract.v01.Request.PassportHolder
 {
     public sealed class UpdatePassportHolderRequest
     {

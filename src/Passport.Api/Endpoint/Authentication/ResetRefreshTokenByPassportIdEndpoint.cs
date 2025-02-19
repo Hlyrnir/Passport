@@ -7,6 +7,9 @@ using Passport.Abstraction.Result;
 using Passport.Application.Command.Authentication.Reset;
 using Passport.Contract.v01.Request.Authentication;
 using Passport.Contract.v01.Response.Authentication;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Passport.Api.Endpoint.Authentication
 {

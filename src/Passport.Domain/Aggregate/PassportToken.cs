@@ -1,4 +1,6 @@
-﻿namespace Passport.Domain.Aggregate
+﻿using System;
+
+namespace Passport.Domain.Aggregate
 {
     public sealed class PassportToken
     {

@@ -2,6 +2,8 @@
 using Passport.Abstraction.Result;
 using Passport.Abstraction.Validation;
 using Passport.Application.Result;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Passport.Application.Validation
 {

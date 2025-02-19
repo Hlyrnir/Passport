@@ -1,4 +1,7 @@
-﻿namespace Passport.Application.Interface
+﻿using System;
+using System.Threading.Tasks;
+
+namespace Passport.Application.Interface
 {
     public interface IUnitOfWork
     {

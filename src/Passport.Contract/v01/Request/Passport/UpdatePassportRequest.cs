@@ -1,4 +1,7 @@
-﻿namespace Passport.Contract.v01.Request.Passport
+﻿using System;
+using System.Collections.Generic;
+
+namespace Passport.Contract.v01.Request.Passport
 {
     public sealed class UpdatePassportRequest : VerifiedRequest
     {

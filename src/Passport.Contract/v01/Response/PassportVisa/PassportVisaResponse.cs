@@ -1,4 +1,6 @@
-﻿namespace Passport.Contract.v01.Response.PassportVisa
+﻿using System;
+
+namespace Passport.Contract.v01.Response.PassportVisa
 {
     public sealed class PassportVisaResponse
     {

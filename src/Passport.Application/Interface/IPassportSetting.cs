@@ -1,4 +1,7 @@
-﻿namespace Passport.Application.Interface
+﻿using System;
+using System.Collections.Generic;
+
+namespace Passport.Application.Interface
 {
     public interface IPassportSetting
     {

@@ -8,6 +8,9 @@ using Passport.Abstraction.Result;
 using Passport.Application.Command.Passport.Seize;
 using Passport.Application.Default;
 using Passport.Contract.v01.Request.Passport;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Passport.Api.Endpoint.Passport
 {

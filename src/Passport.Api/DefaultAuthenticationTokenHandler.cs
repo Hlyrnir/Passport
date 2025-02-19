@@ -1,4 +1,5 @@
 ﻿using Passport.Abstraction.Authentication;
+using System;
 
 namespace Passport.Api
 {

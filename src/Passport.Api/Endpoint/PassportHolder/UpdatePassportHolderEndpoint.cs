@@ -6,6 +6,9 @@ using Passport.Abstraction.Result;
 using Passport.Application.Command.PassportHolder.Update;
 using Passport.Application.Default;
 using Passport.Contract.v01.Request.PassportHolder;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Passport.Api.Endpoint.PassportHolder
 {

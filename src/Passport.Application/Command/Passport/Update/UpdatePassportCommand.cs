@@ -2,6 +2,8 @@
 using Passport.Abstraction.Authentication;
 using Passport.Abstraction.Authorization;
 using Passport.Abstraction.Result;
+using System;
+using System.Collections.Generic;
 
 namespace Passport.Application.Command.Passport.Update
 {

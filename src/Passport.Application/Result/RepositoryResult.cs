@@ -1,4 +1,7 @@
-﻿namespace Passport.Application.Result
+﻿using System;
+using System.Threading.Tasks;
+
+namespace Passport.Application.Result
 {
     public readonly struct RepositoryResult<T> where T : notnull
     {

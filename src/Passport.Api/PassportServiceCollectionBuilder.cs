@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Passport.Application;
 using Passport.Application.Interface;
 using Passport.Infrastructure;
+using System;
 
 namespace Passport.Api
 {
