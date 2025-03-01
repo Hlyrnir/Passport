@@ -18,11 +18,12 @@ namespace Passport.Api.Endpoint.Passport
     {
         public const string Name = "SeizePassport";
 
-        public static void AddSeizePassportEndpoint(this IEndpointRouteBuilder epBuilder, params string[] sPolicyName)
+        public static void AddSeizePassportEndpoint(this IEndpointRouteBuilder epBuilder, string sCorsPolicyName, params string[] sAuthorizationPolicyName)
         {
             epBuilder.MapDelete(
                 EndpointRoute.Passport.Delete, SeizePassport)
-                .RequireAuthorization(sPolicyName)
+                .RequireCors(sCorsPolicyName)
+                .RequireAuthorization(sAuthorizationPolicyName)
                 .WithName(Name)
                 .WithTags("Passport")
                 .Produces(StatusCodes.Status401Unauthorized)

@@ -9,45 +9,45 @@ namespace Passport.Api.Endpoint
 {
     public static class EndpointRouteBuilderExtension
     {
-        public static void AddAuthenticationEndpoint(this IEndpointRouteBuilder epBuilder, params string[] sPolicyName)
+        public static void AddAuthenticationEndpoint(this IEndpointRouteBuilder epBuilder, string sCorsPolicyName, params string[] sAuthorizationPolicyName)
         {
-            epBuilder.AddGenerateAuthenticationTokenByCredentialEndpoint();
-            epBuilder.AddGenerateAuthenticationTokenByRefreshTokenEndpoint();
-            epBuilder.AddResetRefreshTokenByPassportIdEndpoint(sPolicyName: sPolicyName);
+            epBuilder.AddGenerateAuthenticationTokenByCredentialEndpoint(sCorsPolicyName: sCorsPolicyName);
+            epBuilder.AddGenerateAuthenticationTokenByRefreshTokenEndpoint(sCorsPolicyName: sCorsPolicyName);
+            epBuilder.AddResetRefreshTokenByPassportIdEndpoint(sCorsPolicyName: sCorsPolicyName, sAuthorizationPolicyName: sAuthorizationPolicyName);
         }
 
-        public static void AddPassportEndpoint(this IEndpointRouteBuilder epBuilder, params string[] sPolicyName)
+        public static void AddPassportEndpoint(this IEndpointRouteBuilder epBuilder, string sCorsPolicyName, params string[] sAuthorizationPolicyName)
         {
-            epBuilder.AddFindPassportByIdEndpoint(sPolicyName: sPolicyName);
-            epBuilder.AddRegisterPassportEndpoint(sPolicyName: sPolicyName);
-            epBuilder.AddSeizePassportEndpoint(sPolicyName: sPolicyName);
-            epBuilder.AddUpdatePassportEndpoint(sPolicyName: sPolicyName);
+            epBuilder.AddFindPassportByIdEndpoint(sCorsPolicyName: sCorsPolicyName, sAuthorizationPolicyName: sAuthorizationPolicyName);
+            epBuilder.AddRegisterPassportEndpoint(sCorsPolicyName: sCorsPolicyName, sAuthorizationPolicyName: sAuthorizationPolicyName);
+            epBuilder.AddSeizePassportEndpoint(sCorsPolicyName: sCorsPolicyName, sAuthorizationPolicyName: sAuthorizationPolicyName);
+            epBuilder.AddUpdatePassportEndpoint(sCorsPolicyName: sCorsPolicyName, sAuthorizationPolicyName: sAuthorizationPolicyName);
         }
 
-        public static void AddPassportHolderEndpoint(this IEndpointRouteBuilder epBuilder, params string[] sPolicyName)
+        public static void AddPassportHolderEndpoint(this IEndpointRouteBuilder epBuilder, string sCorsPolicyName, params string[] sAuthorizationPolicyName)
         {
-            epBuilder.AddConfirmEmailAddressEndpoint(sPolicyName: sPolicyName);
-            epBuilder.AddConfirmPhoneNumberEndpoint(sPolicyName: sPolicyName);
-            epBuilder.AddDeletePassportHolderEndpoint(sPolicyName: sPolicyName);
-            epBuilder.AddFindPassportHolderByIdEndpoint(sPolicyName: sPolicyName);
-            epBuilder.AddUpdatePassportHolderEndpoint(sPolicyName: sPolicyName);
+            epBuilder.AddConfirmEmailAddressEndpoint(sCorsPolicyName: sCorsPolicyName, sAuthorizationPolicyName: sAuthorizationPolicyName);
+            epBuilder.AddConfirmPhoneNumberEndpoint(sCorsPolicyName: sCorsPolicyName, sAuthorizationPolicyName: sAuthorizationPolicyName);
+            epBuilder.AddDeletePassportHolderEndpoint(sCorsPolicyName: sCorsPolicyName, sAuthorizationPolicyName: sAuthorizationPolicyName);
+            epBuilder.AddFindPassportHolderByIdEndpoint(sCorsPolicyName: sCorsPolicyName, sAuthorizationPolicyName: sAuthorizationPolicyName);
+            epBuilder.AddUpdatePassportHolderEndpoint(sCorsPolicyName: sCorsPolicyName, sAuthorizationPolicyName: sAuthorizationPolicyName);
         }
 
-        public static void AddPassportTokenEndpoint(this IEndpointRouteBuilder epBuilder, params string[] sPolicyName)
+        public static void AddPassportTokenEndpoint(this IEndpointRouteBuilder epBuilder, string sCorsPolicyName, params string[] sAuthorizationPolicyName)
         {
-            epBuilder.AddCreatePassportTokenEndpoint(sPolicyName: sPolicyName);
-            epBuilder.AddDeletePassportTokenEndpoint(sPolicyName: sPolicyName);
-            epBuilder.AddEnableTwoFactorAuthenticationEndpoint(sPolicyName: sPolicyName);
-            epBuilder.AddResetCredentialEndpoint(sPolicyName: sPolicyName);
+            epBuilder.AddCreatePassportTokenEndpoint(sCorsPolicyName: sCorsPolicyName, sAuthorizationPolicyName: sAuthorizationPolicyName);
+            epBuilder.AddDeletePassportTokenEndpoint(sCorsPolicyName: sCorsPolicyName, sAuthorizationPolicyName: sAuthorizationPolicyName);
+            epBuilder.AddEnableTwoFactorAuthenticationEndpoint(sCorsPolicyName: sCorsPolicyName, sAuthorizationPolicyName: sAuthorizationPolicyName);
+            epBuilder.AddResetCredentialEndpoint(sCorsPolicyName: sCorsPolicyName, sAuthorizationPolicyName: sAuthorizationPolicyName);
         }
 
-        public static void AddPassportVisaEndpoint(this IEndpointRouteBuilder epBuilder, params string[] sPolicyName)
+        public static void AddPassportVisaEndpoint(this IEndpointRouteBuilder epBuilder, string sCorsPolicyName, params string[] sAuthorizationPolicyName)
         {
-            epBuilder.AddCreatePassportVisaEndpoint(sPolicyName: sPolicyName);
-            epBuilder.AddDeletePassportVisaEndpoint(sPolicyName: sPolicyName);
-            epBuilder.AddFindPassportVisaByIdEndpoint(sPolicyName: sPolicyName);
-            epBuilder.AddFindPassportVisaByPassportIdEndpoint(sPolicyName: sPolicyName);
-            epBuilder.AddUpdatePassportVisaEndpoint(sPolicyName: sPolicyName);
+            epBuilder.AddCreatePassportVisaEndpoint(sCorsPolicyName: sCorsPolicyName, sAuthorizationPolicyName: sAuthorizationPolicyName);
+            epBuilder.AddDeletePassportVisaEndpoint(sCorsPolicyName: sCorsPolicyName, sAuthorizationPolicyName: sAuthorizationPolicyName);
+            epBuilder.AddFindPassportVisaByIdEndpoint(sCorsPolicyName: sCorsPolicyName, sAuthorizationPolicyName: sAuthorizationPolicyName);
+            epBuilder.AddFindPassportVisaByPassportIdEndpoint(sCorsPolicyName: sCorsPolicyName, sAuthorizationPolicyName: sAuthorizationPolicyName);
+            epBuilder.AddUpdatePassportVisaEndpoint(sCorsPolicyName: sCorsPolicyName, sAuthorizationPolicyName: sAuthorizationPolicyName);
         }
     }
 }

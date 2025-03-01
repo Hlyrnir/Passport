@@ -18,11 +18,12 @@ namespace Passport.Api.Endpoint.PassportToken
     {
         public const string Name = "CreatePassportToken";
 
-        public static void AddCreatePassportTokenEndpoint(this IEndpointRouteBuilder epBuilder, params string[] sPolicyName)
+        public static void AddCreatePassportTokenEndpoint(this IEndpointRouteBuilder epBuilder, string sCorsPolicyName, params string[] sAuthorizationPolicyName)
         {
             epBuilder.MapPost(
                 EndpointRoute.PassportToken.Create, CreatePassportToken)
-                .RequireAuthorization(sPolicyName)
+                .RequireCors(sCorsPolicyName)
+                .RequireAuthorization(sAuthorizationPolicyName)
                 .WithName(Name)
                 .WithTags("PassportToken")
                 .Produces(StatusCodes.Status401Unauthorized)

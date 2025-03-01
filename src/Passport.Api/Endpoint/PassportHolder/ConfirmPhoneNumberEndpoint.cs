@@ -16,11 +16,12 @@ namespace Passport.Api.Endpoint.PassportHolder
     {
         public const string Name = "ConfirmPhoneNumber";
 
-        public static void AddConfirmPhoneNumberEndpoint(this IEndpointRouteBuilder epBuilder, params string[] sPolicyName)
+        public static void AddConfirmPhoneNumberEndpoint(this IEndpointRouteBuilder epBuilder, string sCorsPolicyName, params string[] sAuthorizationPolicyName)
         {
             epBuilder.MapPut(
                 EndpointRoute.PassportHolder.ConfirmPhoneNumber, ConfirmPhoneNumber)
-                .RequireAuthorization(sPolicyName)
+                .RequireCors(sCorsPolicyName)
+                .RequireAuthorization(sAuthorizationPolicyName)
                 .WithName(Name)
                 .WithTags("PassportHolder")
                 .Produces(StatusCodes.Status401Unauthorized)

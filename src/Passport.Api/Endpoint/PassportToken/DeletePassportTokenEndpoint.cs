@@ -18,11 +18,12 @@ namespace Passport.Api.Endpoint.PassportToken
     {
         public const string Name = "DeletePassportToken";
 
-        public static void AddDeletePassportTokenEndpoint(this IEndpointRouteBuilder epBuilder, params string[] sPolicyName)
+        public static void AddDeletePassportTokenEndpoint(this IEndpointRouteBuilder epBuilder, string sCorsPolicyName, params string[] sAuthorizationPolicyName)
         {
             epBuilder.MapDelete(
                 EndpointRoute.PassportToken.Delete, DeletePassportToken)
-                .RequireAuthorization(sPolicyName)
+                .RequireCors(sCorsPolicyName)
+                .RequireAuthorization(sAuthorizationPolicyName)
                 .WithName(Name)
                 .WithTags("PassportToken")
                 .Produces(StatusCodes.Status401Unauthorized)

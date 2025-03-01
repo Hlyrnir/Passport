@@ -17,10 +17,11 @@ namespace Passport.Api.Endpoint.Authentication
     {
         public const string Name = "GenerateTokenByCredential";
 
-        public static void AddGenerateAuthenticationTokenByCredentialEndpoint(this IEndpointRouteBuilder epBuilder)
+        public static void AddGenerateAuthenticationTokenByCredentialEndpoint(this IEndpointRouteBuilder epBuilder, string sCorsPolicyName)
         {
             epBuilder.MapPost(
                 EndpointRoute.Authentication.Token, GenerateTokenByCredential)
+                .RequireCors(sCorsPolicyName)
                 .AllowAnonymous()
                 .WithName(Name)
                 .WithTags("Authentication")

@@ -18,11 +18,12 @@ namespace Passport.Api.Endpoint.PassportVisa
     {
         public const string Name = "FindPassportVisaByPassportId";
 
-        public static void AddFindPassportVisaByPassportIdEndpoint(this IEndpointRouteBuilder epBuilder, params string[] sPolicyName)
+        public static void AddFindPassportVisaByPassportIdEndpoint(this IEndpointRouteBuilder epBuilder, string sCorsPolicyName, params string[] sAuthorizationPolicyName)
         {
             epBuilder.MapGet(
                 EndpointRoute.PassportVisa.GetByPassportId, FindPassportVisaByPassportId)
-                .RequireAuthorization(sPolicyName)
+                .RequireCors(sCorsPolicyName)
+                .RequireAuthorization(sAuthorizationPolicyName)
                 .WithName(Name)
                 .WithTags("PassportVisa")
                 .Produces(StatusCodes.Status401Unauthorized)

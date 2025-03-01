@@ -17,11 +17,12 @@ namespace Passport.Api.Endpoint.PassportToken
     {
         public const string Name = "ResetCredential";
 
-        public static void AddResetCredentialEndpoint(this IEndpointRouteBuilder epBuilder, params string[] sPolicyName)
+        public static void AddResetCredentialEndpoint(this IEndpointRouteBuilder epBuilder, string sCorsPolicyName, params string[] sAuthorizationPolicyName)
         {
             epBuilder.MapPut(
                 EndpointRoute.PassportToken.ResetCredential, ResetCredential)
-                .RequireAuthorization(sPolicyName)
+                .RequireCors(sCorsPolicyName)
+                .RequireAuthorization(sAuthorizationPolicyName)
                 .WithName(Name)
                 .WithTags("PassportToken")
                 .Produces(StatusCodes.Status401Unauthorized)

@@ -16,10 +16,11 @@ namespace Passport.Api.Endpoint.Authentication
     {
         public const string Name = "GenerateTokenByRefreshToken";
 
-        public static void AddGenerateAuthenticationTokenByRefreshTokenEndpoint(this IEndpointRouteBuilder epBuilder)
+        public static void AddGenerateAuthenticationTokenByRefreshTokenEndpoint(this IEndpointRouteBuilder epBuilder, string sCorsPolicyName)
         {
             epBuilder.MapPost(
                 EndpointRoute.Authentication.RefreshToken, GenerateTokenByRefreshToken)
+                .RequireCors(sCorsPolicyName)
                 .AllowAnonymous()
                 .WithName(Name)
                 .WithTags("Authentication")
